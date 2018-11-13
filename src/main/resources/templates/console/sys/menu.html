@@ -22,7 +22,7 @@
                     <div class="nav-tabs-navigation">
                         <div class="nav-tabs-wrapper">
                             <span class="nav-tabs-title"></span>
-                            <ul class="nav nav-tabs" data-tabs="tabs">
+                            <ul class="nav nav-tabs nav-opt" data-tabs="tabs">
                                 <li class="nav-item">
                                     <button class="btn btn-link nav-link" id="addItem" data-title="新增菜单">
                                         <i class="material-icons">add_circle_outline</i> 新增
@@ -272,7 +272,7 @@
                         formatter: function (value, row, index) {
                             var url = /*[[@{/console/sys/asset/}]]*/;
 
-                            var str = '<div class="td-actions"><button type="button" class="btn btn-success btn-link"  onclick="DP.editLink(' + row.id + ', this)" data-modal-title="修改用户"' +
+                            var str = '<div class="td-actions"><button type="button" class="btn btn-success btn-link"  onclick="DP.editLink(' + row.id + ', this)" data-modal-title="修改菜单"' +
                                 '><i class="material-icons">edit</i></button>' +
                                 '<button type="button" class="btn btn-danger btn-link" onclick="DP.delLink(this)" data-url="' + url + '" data-id="' + row.id +
                                 '"><i class="material-icons">close</i></button></div>';
