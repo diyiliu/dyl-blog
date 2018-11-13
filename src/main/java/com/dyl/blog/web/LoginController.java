@@ -1,16 +1,21 @@
 package com.dyl.blog.web;
 
+import com.dyl.blog.web.sys.dto.SysAsset;
+import com.dyl.blog.web.sys.facade.SysAssetJpa;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.ExcessiveAttemptsException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  * Description: LoginController
@@ -22,10 +27,17 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/console")
 public class LoginController {
 
-    @GetMapping
-    public String index() {
 
-        return "console/index";
+    @Resource
+    private SysAssetJpa sysAssetJpa;
+
+
+    @GetMapping
+    public String index(HttpSession session) {
+        SysAsset asset = sysAssetJpa.findByCode("index");
+        session.setAttribute("active", asset);
+
+        return asset.getView();
     }
 
     @GetMapping("/login")
@@ -53,8 +65,9 @@ public class LoginController {
 
             return "redirect:/console/login";
         }
+        SysAsset asset = (SysAsset) request.getSession().getAttribute("active");
 
-        return "console/index";
+        return asset.getView();
     }
 
     @GetMapping("/logout")
@@ -62,5 +75,21 @@ public class LoginController {
         SecurityUtils.getSubject().logout();
 
         return "redirect:/console/login";
+    }
+
+
+    @GetMapping("/{menu}")
+    public String display(@PathVariable("menu") String menu, HttpServletRequest request) {
+
+        SysAsset asset = sysAssetJpa.findByController("console/" + menu);
+        if (asset == null) {
+            return "error/404";
+        }
+
+        String view = asset.getView();
+        // 设置当前页
+        request.getSession().setAttribute("active", asset);
+
+        return view;
     }
 }

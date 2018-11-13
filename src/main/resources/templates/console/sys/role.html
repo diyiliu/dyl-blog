@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{layout/console}">
+<head>
+    <title>帝一流博客 - 后台管理</title>
+    <link th:href="@{/assets/plugin/treeview/dhtmlxtreeview.css}" type="text/css" rel="stylesheet">
+</head>
+
+<body>
+<div layout:fragment="breadcrumb">
+    <a class="navbar-brand" href="javascript: void(0);">角色管理</a>
+</div>
+
+<div layout:fragment="container" class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header card-header-tabs card-header-rose">
+                    <div class="nav-tabs-navigation">
+                        <div class="nav-tabs-wrapper">
+                            <span class="nav-tabs-title"></span>
+                            <ul class="nav nav-tabs" data-tabs="tabs">
+                                <li class="nav-item">
+                                    <button class="btn btn-link nav-link" id="addItem" data-title="新增角色">
+                                        <i class="material-icons">add_circle_outline</i> 新增
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table" id="myTable"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">新增角色</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-body">
+                            <form class="form-horizontal" role="form" id="userForm">
+                                <input type="hidden" id="id" name="id">
+                                <div class="row">
+                                    <label for="name" class="col-md-2  col-form-label">角色名称</label>
+                                    <div class="col-md-10">
+                                        <input type="text" class="form-control" id="name" name="name">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="code" class="col-md-2  col-form-label">角色代码</label>
+                                    <div class="col-md-10">
+                                        <input type="text" class="form-control" id="code" name="code">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="comment" class="col-md-2  col-form-label">角色描述</label>
+                                    <div class="col-md-10">
+                                        <textarea class="form-control" name="comment" id="comment"></textarea>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-rose" id="saveItem"
+                                    th:attr="data-url=@{/console/sys/role}">保存
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+
+    <div id="menuModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        授权角色
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <div id="menuTree" class="modal-tree"></div>
+                    <input type="hidden" name="roleId" id="roleId">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-rose" id="saveMenu">保存</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+</div>
+
+<div layout:fragment="pageJs">
+    <script th:src="@{/assets/plugin/treeview/dhtmlxtreeview.min.js}"></script>
+    <script th:inline="javascript">
+        $(function () {
+            var $table = $('#myTable');
+
+            DP.init({
+                addBefore: function () {
+                    $('#id').val('');
+                },
+                editBefore: function (i) {
+                    var role = $table.bootstrapTable('getRowByUniqueId', i);
+
+                    $('#id').val(role['id']);
+                    $('#name').val(role['name']);
+                    $('#code').val(role['code']);
+                    $('#comment').val(role['comment']);
+                }
+            });
+
+            var tableHeight = $("div.main-panel").height() - 326;
+            DP.table.init({
+                height: tableHeight,
+                url: /*[[@{/console/sys/roleList}]]*/,
+                columns: [
+                    {
+                        field: 'name',
+                        title: '角色名称'
+                    },
+                    {
+                        field: 'code',
+                        title: '角色代码',
+                        align: 'center',
+                    },
+                    {
+                        field: 'comment',
+                        title: '角色描述'
+                    },
+                    {
+                        field: 'createUser',
+                        title: '创建人'
+                    },
+                    {
+                        field: 'createTime',
+                        title: '创建时间',
+                        align: 'center',
+                    },
+                    {
+                        field: '',
+                        title: '授权',
+                        align: 'center',
+                        formatter: function (value, row, index) {
+                            return '<div class="td-actions"><a href="#menuModal" data-toggle="modal"  class="btn btn-warning btn-link" data-id="' + row.id + '">' +
+                                '<i class="material-icons">build</i></a></div>';
+                        }
+                    },
+                    {
+                        field: '',
+                        title: '操作',
+                        align: 'right',
+                        formatter: function (value, row, index) {
+                            var url = /*[[@{/console/sys/role/}]]*/;
+
+                            var str = '<div class="td-actions"><button type="button" class="btn btn-success btn-link"  onclick="DP.editLink(' + row.id + ', this)" data-modal-title="修改角色"' +
+                                '><i class="material-icons">edit</i></button>' +
+                                '<button type="button" class="btn btn-danger btn-link" onclick="DP.delLink(this)" data-url="' + url + '" data-id="' + row.id +
+                                '"><i class="material-icons">close</i></button></div>';
+                            return str;
+                        }
+                    }
+                ]
+            });
+
+            var myTreeView;
+            $('#menuModal').on('shown.bs.modal', function (event) {
+                var aObj = $(event.relatedTarget);
+                var roleId = aObj.data('id');
+                $('#roleId').val(roleId);
+
+                var path = /*[[@{/console/sys/assetTree/}]]*/;
+                myTreeView = new dhtmlXTreeView({
+                    parent: "menuTree",
+                    checkboxes: true,
+                    json: path + roleId
+                });
+            });
+
+            $('#saveMenu').on('click', function () {
+                var roleId = $('#roleId').val();
+                var assetArr = myTreeView.getAllChecked();
+
+                var dataArr = [];
+                for (var i = 0; i < assetArr.length; i++) {
+                    var id = assetArr[i];
+
+                    var obj = {};
+                    obj.master = 'role';
+                    obj.masterValue = roleId;
+                    obj.accessValue = id;
+                    obj.access = myTreeView.getUserData(id, 'access');
+                    obj.permission = myTreeView.getUserData(id, 'permission');
+
+                    dataArr[i] = obj;
+                }
+
+                var path = /*[[@{/console/sys/roleAsset/}]]*/;
+                $.ajax({
+                    type: "post",
+                    url: path + roleId,
+                    contentType: "application/json;charset=utf-8",
+                    data: JSON.stringify(dataArr),
+                    dataType: "json",
+                    success: function (res) {
+                        if (res == 1) {
+                            $('#menuModal').modal('hide');
+                            $('#roleTable').bootstrapTable('refresh');
+
+                            alertTip('success', '保存成功');
+                        } else {
+                            alertTip('error', '保存失败');
+                        }
+                    },
+                    error: function (res) {
+                        alertTip('error', '服务器异常:' + res.status + '! ');
+                    }
+                });
+            });
+        });
+    </script>
+</div>
+</body>
+
+</html>

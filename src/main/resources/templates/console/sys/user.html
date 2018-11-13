@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{layout/console}">
+<head>
+    <title>帝一流博客 - 后台管理</title>
+</head>
+
+
+<body>
+<div layout:fragment="breadcrumb">
+    <a class="navbar-brand" href="javascript: void(0);">用户管理</a>
+</div>
+
+<div layout:fragment="container" class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header card-header-tabs card-header-rose">
+                    <div class="nav-tabs-navigation">
+                        <div class="nav-tabs-wrapper">
+                            <span class="nav-tabs-title"></span>
+                            <ul class="nav nav-tabs" data-tabs="tabs">
+                                <li class="nav-item">
+                                    <button class="btn btn-link nav-link" id="addItem" data-title="新增用户">
+                                        <i class="material-icons">add_circle_outline</i> 新增
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table" id="myTable"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">新增用户</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-body">
+                            <form class="form-horizontal" role="form" id="userForm">
+                                <input type="hidden" id="id" name="id">
+                                <div class="row">
+                                    <label for="username" class="col-md-2  col-form-label">登录名</label>
+                                    <div class="col-md-10">
+                                        <input type="text" class="form-control" id="username" name="username">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="name" class="col-md-2  col-form-label">用户名</label>
+                                    <div class="col-md-10">
+                                        <input type="text" class="form-control" id="name" name="name">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="tel" class="col-md-2  col-form-label">电话</label>
+                                    <div class="col-md-10">
+                                        <input type="text" class="form-control" id="tel" name="tel">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="email" class="col-md-2  col-form-label">邮箱</label>
+                                    <div class="col-md-10">
+                                        <input type="email" class="form-control" id="email" name="email">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="expireTime" class="col-md-2  col-form-label">过期时间</label>
+                                    <div class="col-md-10">
+                                        <input type="text" class="form-control" id="expireTime" name="expireTimeStr">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="selRole" class="col-md-2  col-form-label">角色</label>
+                                    <div class="col-md-10">
+                                        <select class="selectpicker form-control" data-style="select-with-transition"
+                                                title="选择角色" data-size="5" id="selRole" name="roleId">
+                                            <option th:each="role:${#request.getAttribute('roles')}"
+                                                    th:value="${role.id}" th:text="${role.name}"></option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-rose" id="saveItem" th:attr="data-url=@{/console/sys/user}">
+                        保存
+                    </button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+</div>
+
+<div layout:fragment="pageJs">
+    <script th:inline="javascript">
+        $(function () {
+            var $table = $('#myTable');
+
+            DP.init({
+                addAfter: function () {
+                    $('#id').val('');
+                    document.getElementById('username').readOnly = false;
+                    $('#selRole').selectpicker('refresh');
+
+                    // 设置默认过期时间
+                    var expire = new Date();
+                    expire.setFullYear(expire.getFullYear() + 1);
+                    expire.setDate(expire.getDate() - 1);
+                    laydate.render({
+                        elem: '#expireTime'
+                        , type: 'datetime'
+                        , value: expire
+                    });
+                },
+                editAfter: function (i) {
+                    var user = $table.bootstrapTable('getRowByUniqueId', i);
+                    // 重置表单
+                    $('#id').val(user['id']);
+                    $('#username').val(user['username']);
+                    $('#name').val(user['name']);
+                    $('#tel').val(user['tel']);
+                    $('#email').val(user['email']);
+                    document.getElementById('username').readOnly = true;
+
+                    var role = user['roles'][0];
+                    if (role) {
+                        $('#selRole').selectpicker('val', role.id);
+                        // var roleId = role.id;
+                        // var options = document.getElementById('selRole').options;
+                        // for (var i = 0; i < options.length; i++) {
+                        //     var o = options[i];
+                        //     if (o.value == roleId) {
+                        //         o.selected = true;
+                        //     }
+                        // }
+                    }
+                    laydate.render({
+                        elem: '#expireTime'
+                        , type: 'datetime'
+                        , value: user['expireTime']
+                    });
+                }
+            });
+
+            var tableHeight = $("div.main-panel").height() - 326;
+            DP.table.init({
+                height: tableHeight,
+                url: /*[[@{/console/sys/userList}]]*/,
+                columns: [
+                    {
+                        field: 'username',
+                        title: '登录名'
+                    },
+                    {
+                        field: 'name',
+                        title: '姓名'
+                    },
+                    {
+                        field: 'roles',
+                        title: '角色',
+                        formatter: function (value, row, index) {
+                            if (value.length > 0) {
+                                return value[0]['name'];
+                            }
+
+                            return '';
+                        }
+                    },
+                    {
+                        field: '',
+                        title: '机构'
+                    },
+                    {
+                        field: 'tel',
+                        title: '手机'
+                    },
+                    {
+                        field: 'lastLoginTime',
+                        title: '登录时间'
+                    },
+                    {
+                        field: 'createTime',
+                        title: '创建时间',
+                        formatter: function (value, row, index) {
+                            var str = '';
+                            if (value) {
+                                str = value.substr(0, 10);
+                            }
+
+                            return '<span style="cursor: default" title="' + value + '">' + str + '</span>';
+                        }
+                    },
+                    {
+                        field: '',
+                        title: '重置密码',
+                        align: 'center',
+                        formatter: function (value, row, index) {
+                            var str = '<div class="td-actions">' +
+                                '<a href="javascript: void(0);" class="btn btn-warning btn-link" onclick="resetPwd(this);" data-id="' + row.id + '" title="重置密码">' +
+                                '<i class="material-icons">lock_open</i>' +
+                                '</a></div>';
+                            return str;
+                        }
+                    },
+                    {
+                        field: '',
+                        title: '操作',
+                        align: 'right',
+                        formatter: function (value, row, index) {
+                            var url = /*[[@{/console/sys/user/}]]*/;
+
+                            var str = '<div class="td-actions"><button type="button" class="btn btn-success btn-link"  onclick="DP.editLink(' + row.id + ', this)" data-modal-title="修改用户"' +
+                                '><i class="material-icons">edit</i></button>' +
+                                '<button type="button" class="btn btn-danger btn-link" onclick="DP.delLink(this)" data-url="' + url + '" data-id="' + row.id +
+                                '"><i class="material-icons">close</i></button></div>';
+                            return str;
+                        }
+                    }
+                ]
+            });
+        });
+
+        function resetPwd(a) {
+            var id = $(a).data('id');
+            // 提示
+            swal({
+                    title: "重置用户密码?",
+                    text: "重置后原密码将无法使用",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#e67e22",
+                    confirmButtonText: "重置",
+                    closeOnConfirm: true
+                },
+                function () {
+                    var path = /*[[@{/console/sys/userPwd/}]]*/;
+                    $.ajax({
+                        type: 'put',
+                        url: path + id,
+                        dataType: "json",
+                        success: function (result) {
+                            if (result == 1) {
+                                alertTip('success', '重置密码成功');
+                            } else {
+                                alertTip('error', '重置密码失败');
+                            }
+                        }
+                    });
+                });
+        };
+    </script>
+</div>
+</body>
+
+</html>

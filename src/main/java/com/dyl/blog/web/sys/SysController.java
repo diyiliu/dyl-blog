@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  */
 
 @RestController
-@RequestMapping("/sys")
+@RequestMapping("/console/sys")
 public class SysController {
 
     @Resource
@@ -139,6 +139,13 @@ public class SysController {
         return sysAssetJpa.findById(id).get();
     }
 
+    @DeleteMapping("/asset/{id}")
+    public Integer deleteAsset(@PathVariable("id") long id) {
+        sysAssetJpa.deleteById(id);
+
+        return 1;
+    }
+
     @DeleteMapping("/asset")
     public Integer deleteAsset(@RequestBody List<Long> ids) {
         sysAssetJpa.deleteByIdIn(ids);
@@ -175,9 +182,8 @@ public class SysController {
         }
 
         Subject subject = SecurityUtils.getSubject();
-
         // 默认密码
-        user.setPassword("123456");
+        user.setPassword("123");
         passwordHelper.encryptPassword(user);
         user.setStatus(1);
         user.setCreateTime(new Date());
@@ -233,6 +239,13 @@ public class SysController {
         return 1;
     }
 
+    @DeleteMapping("/user/{id}")
+    public Integer user(@PathVariable long id) {
+        sysUserJpa.deleteById(id);
+
+        return 1;
+    }
+
     @DeleteMapping("/user")
     public Integer deleteUser(@RequestBody List<Long> ids) {
         sysUserJpa.deleteByIdIn(ids);
@@ -249,7 +262,7 @@ public class SysController {
     @PutMapping("/userPwd/{id}")
     public Integer resetPwd(@PathVariable("id") Long userId) {
         SysUser temp = sysUserJpa.findById(userId).get();
-        temp.setPassword("123456");
+        temp.setPassword("123");
         passwordHelper.encryptPassword(temp);
 
         temp = sysUserJpa.save(temp);
@@ -339,6 +352,13 @@ public class SysController {
 
             return 0;
         }
+
+        return 1;
+    }
+
+    @DeleteMapping("/role/{id}")
+    public Integer deleteRole(@PathVariable long id) {
+        sysRoleJpa.deleteById(id);
 
         return 1;
     }

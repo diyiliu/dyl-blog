@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{layout/console}">
+<head>
+    <title>帝一流博客 - 后台管理</title>
+    <link th:href="@{/assets/plugin/treegrid/css/jquery.treegrid.css}" type="text/css" rel="stylesheet">
+    <link th:href="@{/assets/plugin/treeview/dhtmlxtreeview.css}" type="text/css" rel="stylesheet">
+</head>
+
+
+<body>
+<div layout:fragment="breadcrumb">
+    <a class="navbar-brand" href="javascript: void(0);">菜单管理</a>
+</div>
+
+<div layout:fragment="container" class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header card-header-tabs card-header-rose">
+                    <div class="nav-tabs-navigation">
+                        <div class="nav-tabs-wrapper">
+                            <span class="nav-tabs-title"></span>
+                            <ul class="nav nav-tabs" data-tabs="tabs">
+                                <li class="nav-item">
+                                    <button class="btn btn-link nav-link" id="addItem" data-title="新增菜单">
+                                        <i class="material-icons">add_circle_outline</i> 新增
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table" id="myTable"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">新增菜单</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-body">
+                            <form class="form-horizontal" role="form" id="userForm">
+                                <div class="row">
+                                    <input type="hidden" id="id" name="id">
+                                    <label for="pid" class="col-md-2 col-form-label">父节点</label>
+                                    <div class="col-md-10">
+                                        <input type="hidden" id="pid" name="pid" value="0">
+                                        <input type="hidden" id="pids" name="pids" value="0">
+
+                                        <div class="dropdown" id="nodeDrop">
+                                            <a id="nodeToggle" class="form-control" style="line-height: inherit;"
+                                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">父节点</a>
+                                            <div class="dropdown-menu form-control" aria-labelledby="nodeToggle" id="treeDrop">
+                                                <div id="menuTree" class="modal-tree" style="height: 280px;border: 0px;box-shadow: none;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="selType" class="col-md-2  col-form-label">资源类型</label>
+                                    <div class="col-md-10">
+                                        <select class="selectpicker form-control" data-style="select-with-transition"
+                                                title="选择类型" data-size="5" id="selType" name="type">
+                                            <option value="menu">菜单</option>
+                                            <option value="node">节点</option>
+                                            <option value="button">按钮</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="name" class="col-md-2  col-form-label">资源名称</label>
+                                    <div class="col-md-10">
+                                        <input type="text" class="form-control" id="name" name="name">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="code" class="col-md-2  col-form-label">资源代码</label>
+                                    <div class="col-md-10">
+                                        <input type="text" class="form-control" id="code" name="code">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="sort" class="col-md-2  col-form-label">排序</label>
+                                    <div class="col-md-10">
+                                        <input type="email" class="form-control" id="sort" name="sort">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="controller" class="col-md-2  col-form-label">控制器</label>
+                                    <div class="col-md-10">
+                                        <input type="text" class="form-control" id="controller" name="controller">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="view" class="col-md-2  col-form-label">视图</label>
+                                    <div class="col-md-10">
+                                        <input type="text" class="form-control" id="view" name="view">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="iconCss" class="col-md-2  col-form-label">图标样式</label>
+                                    <div class="col-md-10">
+                                        <input type="text" class="form-control" id="iconCss" name="iconCss">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label class="col-md-2 col-form-label">导航菜单</label>
+                                    <div class="col-md-10">
+                                        <div class="form-group togglebutton">
+                                            <label>
+                                                <input type="checkbox" name="isMenu" id="isMenu" value="1">
+                                                <span class="toggle"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-rose" id="saveItem" th:attr="data-url=@{/console/sys/asset}">
+                        保存
+                    </button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+</div>
+
+<div layout:fragment="pageJs">
+    <script th:src="@{/assets/js/jquery-migrate-3.0.0.js}"></script>
+    <script th:src="@{/assets/plugin/treegrid/js/bootstrap-table-treegrid.js}"></script>
+    <script th:src="@{/assets/plugin/treegrid/js/jquery.treegrid.js}"></script>
+    <script th:src="@{/assets/plugin/treeview/dhtmlxtreeview.min.js}"></script>
+    <script th:inline="javascript">
+        $(function () {
+            var $table = $('#myTable');
+
+            DP.init({
+                addBefore: function () {
+                    $('#id').val('');
+                    $('#pid').val(0);
+                    $('#pids').val(0);
+                    $('#nodeToggle').html('');
+                    $('#isMenu')[0].checked = false;
+                },
+                editBefore: function (i) {
+                    var menu = $table.bootstrapTable('getRowByUniqueId', i);
+
+                    $('#nodeToggle').html('');
+                    var pid = menu['pid'];
+                    if (pid) {
+                        var url = /*[[@{/console/sys/asset/}]]*/;
+                        $.ajax({
+                            type: 'post',
+                            url: url + pid,
+                            dataType: "json",
+                            success: function (result) {
+                                if (result){
+                                    $('#nodeToggle').html(result['name']);
+                                }
+                            }
+                        });
+                    }
+
+                    $('#id').val(menu['id']);
+                    $('#name').val(menu['name']);
+                    $('#code').val(menu['code']);
+                    $('#pid').val(menu['pid']);
+                    $('#pids').val(menu['pids']);
+
+                    $('#sort').val(menu['sort']);
+                    $('#controller').val(menu['controller']);
+                    $('#view').val(menu['view']);
+                    $('#iconCss').val(menu['iconCss']);
+
+                    // 下拉选中
+                    $('#selType').selectpicker('val', menu['type']);
+
+                    // 是否导航 选项
+                    if (menu['isMenu'] == 1) {
+                        $('#isMenu')[0].checked = true;
+                    }else {
+                        $('#isMenu')[0].checked = false;
+                    }
+                }
+            });
+
+            DP.table.init({
+                pagination: false,
+                url: /*[[@{/console/sys/assetList}]]*/,
+                striped: true,
+                idField: 'id',
+                columns: [
+                    {
+                        field: 'name',
+                        title: '菜单名称'
+                    },
+                    {
+                        field: 'type',
+                        title: '类型',
+                        align: 'center',
+                        formatter: function (value) {
+                            if (value === 'menu') {
+                                return '菜单';
+                            }
+                            if (value === 'button') {
+                                return '按钮';
+                            }
+                            if (value === 'node') {
+                                return '节点';
+                            }
+                            return '-';
+                        }
+                    },
+                    {
+                        field: 'controller',
+                        title: '控制器'
+                    },
+                    {
+                        field: 'view',
+                        title: '视图'
+                    },
+                    {
+                        field: 'isMenu',
+                        title: '导航菜单',
+                        align: 'center',
+                        formatter: function (value) {
+                            if (value == 1) {
+                                return '是';
+                            }
+                            return '否';
+                        }
+                    },
+                    {
+                        field: 'sort',
+                        title: '排序',
+                        align: 'center'
+                    },
+                    {
+                        field: 'iconCss',
+                        title: '图标',
+                        align: 'center',
+                        formatter: function (value) {
+                            if (value){
+                                return '<div class="td-actions"><button type="button" class="btn btn-link disabled"><i class="material-icons">' + value + '</i></button></div>';
+                            }
+
+                            return '';
+                        }
+                    },
+                    {
+                        field: '',
+                        title: '操作',
+                        align: 'right',
+                        formatter: function (value, row, index) {
+                            var url = /*[[@{/console/sys/asset/}]]*/;
+
+                            var str = '<div class="td-actions"><button type="button" class="btn btn-success btn-link"  onclick="DP.editLink(' + row.id + ', this)" data-modal-title="修改用户"' +
+                                '><i class="material-icons">edit</i></button>' +
+                                '<button type="button" class="btn btn-danger btn-link" onclick="DP.delLink(this)" data-url="' + url + '" data-id="' + row.id +
+                                '"><i class="material-icons">close</i></button></div>';
+                            return str;
+                        }
+                    }
+                ],
+                treeShowField: 'name',
+                parentIdField: 'pid',
+                onLoadSuccess: function () {
+                    $table.treegrid({
+                        treeColumn: 0,
+                        onChange: function () {
+                            $table.bootstrapTable('resetWidth');
+                        }
+                    });
+                }
+            });
+
+            $('#menuTree').on('click', function (e) {
+                var oEvent = e || event;
+                oEvent.cancelBubble = true;
+                oEvent.stopPropagation();
+
+                return false;
+            });
+
+            var myTreeView;
+            $('#nodeDrop').on('shown.bs.dropdown', function () {
+                var path = /*[[@{/console/sys/assetTree/}]]*/;
+                myTreeView = new dhtmlXTreeView({
+                    parent: "menuTree",
+                    json: path + 0
+                });
+
+                myTreeView.attachEvent("onClick", function (id, state) {
+                    var pids = myTreeView.getUserData(id, 'pids');
+                    var text = this.getItemText(id);
+                    $('#pid').val(id);
+                    $('#pids').val(pids + "/" + id);
+
+                    $('#nodeToggle').html(text);
+                    $('#treeDrop').dropdown('toggle');
+                });
+            });
+
+            $('#selType').on('change', function () {
+                var sel = $(this).children('option:selected').val();
+                // node节点只存在导航菜单
+                if (sel == 'node') {
+                    $('#nodeToggle').html('');
+                    $('#pid').val(0);
+                }
+            });
+        });
+    </script>
+</div>
+</body>
+
+</html>

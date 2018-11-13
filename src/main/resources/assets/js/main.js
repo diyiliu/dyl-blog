@@ -1,7 +1,5 @@
 (function($) {
-
 	'use strict';
-
 	// bootstrap dropdown hover
 
   // loader
@@ -135,9 +133,6 @@
   	}
 	});
 
-
- 
-
 	var contentWayPoint = function() {
 		var i = 0;
 		$('.element-animate').waypoint( function( direction ) {
@@ -173,7 +168,4 @@
 		} , { offset: '95%' } );
 	};
 	contentWayPoint();
-
-
-
 })(jQuery);
