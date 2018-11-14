@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{layout/console}">
+<head>
+    <title>帝一流博客 - 后台管理</title>
+
+    <link th:href="@{/assets/plugin/summernote-0.8.9/summernote-bs4.css}" type="text/css" rel="stylesheet">
+</head>
+
+
+<body>
+<div layout:fragment="breadcrumb">
+    <a class="navbar-brand" href="javascript: void(0);">文章编辑</a>
+</div>
+
+<div layout:fragment="container" class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card ">
+                <div class="card-header card-header-rose card-header-icon">
+                    <div class="card-icon">
+                        <i class="material-icons">edit</i>
+                    </div>
+                    <h4 class="card-title">编辑</h4>
+                </div>
+                <div class="card-body ">
+                    <div class="form-group">
+                        <label for="title" class="bmd-label-floating">标题</label>
+                        <input type="text" class="form-control" id="title" name="title">
+                    </div>
+                    <div class="form-group">
+                        <div id="summernote"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card ">
+                <div class="card-header card-header-rose card-header-icon">
+                    <div class="card-icon">
+                        <i class="material-icons">category</i>
+                    </div>
+                    <h4 class="card-title">类别</h4>
+                </div>
+                <div class="card-body ">
+                    <form class="form-horizontal" id="myForm">
+                        <div class="row">
+                            <label class="col-md-2 col-form-label">博客分类</label>
+                            <div class="col-md-10">
+                                <select class="selectpicker form-control"
+                                        data-style="select-with-transition"
+                                        title="选择分类" data-size="5" name="classify">
+                                    <option value="10">物联网</option>
+                                    <option value="11">大数据</option>
+                                    <option value="12">前端开发</option>
+                                    <option value="13">后端开发</option>
+                                    <option value="14">游戏开发</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-2 col-form-label">文章类型</label>
+                            <div class="col-md-10">
+                                <select class="selectpicker form-control"
+                                        data-style="select-with-transition"
+                                        title="选择类型" data-size="5" name="type">
+                                    <option value="1">原创</option>
+                                    <option value="2">转载</option>
+                                    <option value="3">其他</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-2 col-form-label">内容标签</label>
+                            <div class="col-md-10">
+                                <div class="form-group">
+                                    <input type="text" class="form-control tagsinput"
+                                           data-role="tagsinput" data-color="info" name="tags">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-2 col-form-label">仅自己可见</label>
+                            <div class="col-md-10">
+                                <div class="form-group togglebutton">
+                                    <label>
+                                        <input type="checkbox" value="0" name="open">
+                                        <span class="toggle"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer ">
+                    <div class="row">
+                        <div class="col-12 form-group">
+                            <button type="button" class="btn btn-default" onclick="javascript: save(0);">保存</button>
+                            <button type="button" class="btn btn-rose" onclick="javascript: save(1);">发布</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div layout:fragment="pageJs">
+    <script th:src="@{/assets/plugin/summernote-0.8.9/summernote-bs4.min.js}"></script>
+    <script th:src="@{/assets/plugin/summernote-0.8.9/lang/summernote-zh-CN.js}"></script>
+
+    <script th:inline="javascript">
+        $(function () {
+            $('#summernote').summernote({
+                lang: 'zh-CN',
+                height: 430,
+                callbacks: {
+                    onImageUpload: function (files) {
+                        var formData = new FormData();
+                        formData.append('file', files[0]);
+
+                        $.ajax({
+                            type: 'post',
+                            url: /*[[@{/image/upload/}]]*/,
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function (result) {
+                                if (result.status == 1) {
+                                    $('#summernote').summernote('insertImage', result.data);
+                                }
+                            },
+                            error: function () {
+                                layer.msg("插入图片失败!");
+                            }
+                        });
+                    }
+                }
+            });
+        });
+
+        function save(i) {
+            var markupStr = $('#summernote').summernote('code');
+
+            var formData = new FormData($('#myForm')[0]);
+            formData.append('title', $('#title').val());
+            formData.append('status', i);
+            formData.append('content', markupStr);
+            $.ajax({
+                type: 'post',
+                url: /*[[@{/console/blog/save/}]]*/,
+                data: formData,
+                processData: false,
+                contentType: false,
+                beforeSend: function(){
+                    $('.preloader').fadeIn();
+                },
+                complete: function(){
+                    $('.preloader').fadeOut();
+                },
+                success: function (result) {
+                    if (result == 1) {
+                        alertTip('success', '保存成功');
+                    } else {
+                        alertTip('error', '保存失败');
+                    }
+                },
+                error: function () {
+                    alertTip('error', '保存失败');
+                }
+            });
+        }
+    </script>
+</div>
+</body>
+
+</html>

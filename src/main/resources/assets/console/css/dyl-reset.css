@@ -12,8 +12,8 @@
     top: -30px;
 }
 
-.note-editor.note-frame {
-    border: 1px solid #e9ecef;
+.note-editor.note-frame.card {
+    border: 1px solid #d2d2d2;
 }
 
 html body blockquote {
@@ -105,4 +105,25 @@ pre {
 .nav-tabs-wrapper .nav-opt .nav-link {
     background-color: rgba(255, 255, 255, .2);
     transition: .3s background-color .2s;
+}
+
+
+.preloader {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: none;
+}
+
+.preloader .imgloader{
+    display:inline-block;
+    width:42px;
+    height:42px;
+    position:absolute;
+    top:calc(50% - 21px);
+    left:calc(50% - 20px)
 }

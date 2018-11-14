@@ -46,3 +46,8 @@ shiro:
     authc: /console/login,/authenticated
     anon: /,/console/logout,/unauthorized,/assets/**,/image/**
     user: /console/**
+
+
+# 文件路径
+upload:
+  pic: file:./upload/pic/

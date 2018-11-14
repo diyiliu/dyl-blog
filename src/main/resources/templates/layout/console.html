@@ -4,7 +4,7 @@
     <head>
         <meta charset="utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-        <link th:href="@{/assets/image/favicon.ico}" rel="icon">
+        <link th:href="@{/assets/image/favicon_1.ico}" rel="icon">
 
         <!--  Fonts and icons     -->
         <link rel="stylesheet" th:href="@{/assets/font/font-awesome-4.7.0/css/font-awesome.min.css}">
@@ -20,6 +20,12 @@
     </head>
 
     <body>
+        <div class="preloader">
+            <div class="imgloader">
+                <img th:src="@{/assets/image/loader/bars.svg}" width="40" alt="loader">
+            </div>
+        </div>
+
         <div class="wrapper ">
             <div class="sidebar" data-color="azure" data-background-color="white"
                  th:attr="data-image=@{/assets/console/image/sidebar-1.jpg}">
