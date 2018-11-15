@@ -29,6 +29,8 @@ public class Article {
 
     private String content;
 
+    private String overview;
+
     private Integer type;
 
     private Integer classify;

@@ -127,3 +127,7 @@ pre {
     top:calc(50% - 21px);
     left:calc(50% - 20px)
 }
+
+.tags .bootstrap-tagsinput{
+    padding: 0;
+}
