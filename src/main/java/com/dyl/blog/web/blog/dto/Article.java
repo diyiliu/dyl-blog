@@ -33,7 +33,9 @@ public class Article {
 
     private Integer type;
 
-    private Integer classify;
+    @ManyToOne
+    @JoinColumn(name = "classify", referencedColumnName = "id")
+    private Classify classify;
 
     private String tags;
 

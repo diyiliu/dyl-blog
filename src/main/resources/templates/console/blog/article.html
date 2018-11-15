@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{layout/console}">
+<head>
+    <title>帝一流博客 - 后台管理</title>
+</head>
+
+
+<body>
+<div layout:fragment="breadcrumb">
+    <a class="navbar-brand" href="javascript: void(0);">文章管理</a>
+</div>
+
+<div layout:fragment="container" class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header card-header-tabs card-header-rose">
+                    <div class="nav-tabs-navigation">
+                        <div class="nav-tabs-wrapper">
+                            <span class="nav-tabs-title"></span>
+                            <ul class="nav nav-tabs nav-opt" data-tabs="tabs">
+                                <li class="nav-item">
+                                    <button class="btn btn-link nav-link active">
+                                        <i class="material-icons">border_color</i> 写文章
+                                    </button>
+                                </li>
+
+                                <li class="nav-item">
+                                    <button class="btn btn-link nav-link active">
+                                        <i class="material-icons">library_add</i> 栏目
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table" id="myTable"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">新增用户</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-body">
+                            <form class="form-horizontal" role="form" id="userForm">
+                                <input type="hidden" id="id" name="id">
+                                <div class="row">
+                                    <label for="username" class="col-md-2  col-form-label">登录名</label>
+                                    <div class="col-md-10">
+                                        <input type="text" class="form-control" id="username" name="username">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="name" class="col-md-2  col-form-label">用户名</label>
+                                    <div class="col-md-10">
+                                        <input type="text" class="form-control" id="name" name="name">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="tel" class="col-md-2  col-form-label">电话</label>
+                                    <div class="col-md-10">
+                                        <input type="text" class="form-control" id="tel" name="tel">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="email" class="col-md-2  col-form-label">邮箱</label>
+                                    <div class="col-md-10">
+                                        <input type="email" class="form-control" id="email" name="email">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="expireTime" class="col-md-2  col-form-label">过期时间</label>
+                                    <div class="col-md-10">
+                                        <input type="text" class="form-control" id="expireTime" name="expireTimeStr">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="selRole" class="col-md-2  col-form-label">角色</label>
+                                    <div class="col-md-10">
+                                        <select class="selectpicker form-control" data-style="select-with-transition"
+                                                title="选择角色" data-size="5" id="selRole" name="roleId">
+                                            <option th:each="role:${#request.getAttribute('roles')}"
+                                                    th:value="${role.id}" th:text="${role.name}"></option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-rose" id="saveItem" th:attr="data-url=@{/console/sys/user}">
+                        保存
+                    </button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+</div>
+
+<div layout:fragment="pageJs">
+    <script th:inline="javascript">
+        $(function () {
+            var $table = $('#myTable');
+
+            DP.init();
+
+            var tableHeight = $("div.main-panel").height() - 326;
+            DP.table.init({
+                height: tableHeight,
+                url: /*[[@{/console/blog/articles}]]*/,
+                columns: [
+                    {
+                        field: 'title',
+                        title: '标题'
+                    },
+                    {
+                        field: 'type',
+                        title: '类型',
+                        formatter: function (value, row, index) {
+                            if (value ==  1) {
+                                return '原创';
+                            }
+
+                            if (value ==  2) {
+                                return '转载';
+                            }
+
+                            return '其他';
+                        }
+                    },
+                    {
+                        field: 'classify',
+                        title: '栏目',
+                        formatter: function (value, row, index) {
+                            if (value) {
+                                return value['name'];
+                            }
+
+                            return '';
+                        }
+                    },
+                    {
+                        field: 'tags',
+                        title: '标签'
+                    },
+                    {
+                        field: 'updateTime',
+                        title: '修改时间'
+                    },
+                    {
+                        field: 'seeCount',
+                        align: 'center',
+                        title: '查看人数'
+                    },
+                    {
+                        field: 'isTop',
+                        align: 'center',
+                        title: '置顶',
+                        formatter: function (value, row, index) {
+
+                            if (value == 1) {
+                                    return '<div class="td-actions"><button type="button" class="btn btn-link disabled"><i class="material-icons text-warning">star</i></button></div>';
+                            }
+
+                            return '<div class="td-actions"><button type="button" class="btn btn-link disabled"><i class="material-icons">not_interested</i></button></div>';
+                        }
+                    },
+                    {
+                        field: 'status',
+                        title: '状态',
+                        align: 'center',
+                        formatter: function (value, row, index) {
+
+                            if (value == 0) {
+
+                                return '草稿';
+                            }
+
+                            return '正常';
+                        }
+                    },
+                    {
+                        field: '',
+                        title: '操作',
+                        align: 'right',
+                        formatter: function (value, row, index) {
+                            var url = /*[[@{/console/sys/user/}]]*/;
+
+                            var str = '<div class="td-actions"><button type="button" class="btn btn-success btn-link" data-modal-title="修改"' +
+                                '><i class="material-icons">edit</i></button>' +
+                                '<button type="button" class="btn btn-danger btn-link" onclick="DP.delLink(this)" data-url="' + url + '" data-id="' + row.id +
+                                '"><i class="material-icons">close</i></button></div>';
+                            return str;
+                        }
+                    }
+                ]
+            });
+        });
+    </script>
+</div>
+</body>
+
+</html>

@@ -1,14 +1,19 @@
 package com.dyl.blog.web;
 
 import com.dyl.blog.support.model.RespBody;
+import com.dyl.blog.web.blog.dto.Classify;
+import com.dyl.blog.web.blog.facade.ClassifyJpa;
 import com.dyl.blog.web.sys.dto.ResImg;
+import com.dyl.blog.web.sys.dto.SysAsset;
 import com.dyl.blog.web.sys.dto.SysUser;
 import com.dyl.blog.web.sys.facade.ResImgJpa;
 import org.apache.commons.io.FileUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +27,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Description: HomeController
@@ -38,11 +45,27 @@ public class HomeController {
     @Resource
     private ResImgJpa resImgJpa;
 
+    @Resource
+    private ClassifyJpa classifyJpa;
+
     @GetMapping("/")
-    public String index(){
+    public String index(Model model){
 
+        List<Classify> classifyList = classifyJpa.findAll(Sort.by(new String[]{"pid", "sort"}));
 
-        return "console/login";
+        // 根节点
+        List<Classify> rootList = classifyList.stream().filter(a -> a.getPid() == 0).collect(Collectors.toList());
+        // 子节点
+        Map<Long, List<Classify>> listMap = classifyList.stream().filter(a -> a.getPid() > 0)
+                .collect(Collectors.groupingBy(Classify::getPid));
+        for (Classify clz : rootList) {
+            Long id = clz.getId();
+            clz.setChildren(listMap.get(id));
+        }
+        model.addAttribute("active", 0);
+        model.addAttribute("classifys", rootList);
+
+        return "index";
     }
 
     @ResponseBody
