@@ -1,12 +1,17 @@
 package com.dyl.blog.support.shiro.listener;
 
+import com.dyl.blog.web.sys.dto.ResImg;
+import com.dyl.blog.web.sys.facade.ResImgJpa;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * Description: ShiroSessionListener
@@ -19,7 +24,7 @@ import javax.annotation.Resource;
 public class ShiroSessionListener implements SessionListener {
 
     @Resource
-    private Environment environment;
+    private ResImgJpa resImgJpa;
 
 
     @Override
@@ -51,6 +56,16 @@ public class ShiroSessionListener implements SessionListener {
     }
 
     private void clearTemp(Session session) throws Exception {
-
+        List<ResImg> imgList = (List<ResImg>) session.getAttribute("temp_pic");
+        if (CollectionUtils.isNotEmpty(imgList)) {
+            for (ResImg img : imgList) {
+                resImgJpa.deleteById(img.getId());
+                org.springframework.core.io.Resource res = new UrlResource("file:" + img.getPath());
+                if (res.exists()) {
+                    res.getFile().delete();
+                    log.info("删除临时文件: [{}]", img.getPath());
+                }
+            }
+        }
     }
 }

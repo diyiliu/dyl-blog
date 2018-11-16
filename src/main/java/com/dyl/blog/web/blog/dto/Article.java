@@ -31,6 +31,8 @@ public class Article {
 
     private String overview;
 
+    private Long resImg;
+
     private Integer type;
 
     @ManyToOne

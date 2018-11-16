@@ -14,7 +14,7 @@
 
                 <div class="owl-carousel owl-theme home-slider">
                     <div>
-                        <a href="blog-single.html" class="a-block d-flex align-items-center height-lg" style="background-image: url('assets/image/img_1.jpg'); ">
+                        <a href="javascript: void(0);" class="a-block d-flex align-items-center height-lg" style="background-image: url('assets/image/img_1.jpg'); ">
                             <div class="text half-to-full">
                                 <h3>格局觉得结局</h3>
                                 <p>从零开始，重新出发</p>
@@ -22,7 +22,7 @@
                         </a>
                     </div>
                     <div>
-                        <a href="blog-single.html" class="a-block d-flex align-items-center height-lg" style="background-image: url('assets/image/img_2.jpg'); ">
+                        <a href="javascript: void(0);" class="a-block d-flex align-items-center height-lg" style="background-image: url('assets/image/img_2.jpg'); ">
                             <div class="text half-to-full">
                                 <h3>完成比完美更重要</h3>
                                 <p>积极进去，有始有终</p>
@@ -35,9 +35,10 @@
     </div>
 </section>
 
-<h2 layout:fragment="classify" class="mb-4"># JAVA</h2>
+<h2 layout:fragment="classify" class="mb-4">最新文章</h2>
 <div layout:fragment="main" class="col-md-12 col-lg-8 main-content">
     <div class="row">
+
         <div class="col-md-6">
             <a href="blog-single.html" class="blog-entry element-animate" data-animate-effect="fadeIn">
                 <img th:src="@{/assets/image/img_5.jpg}" alt="Image placeholder">
@@ -51,6 +52,7 @@
                 </div>
             </a>
         </div>
+
         <div class="col-md-6">
             <a href="blog-single.html" class="blog-entry element-animate" data-animate-effect="fadeIn">
                 <img th:src="@{/assets/image/img_6.jpg}" alt="Image placeholder">
@@ -144,23 +146,48 @@
                 </div>
             </a>
         </div>
+
     </div>
 
     <div class="row">
         <div class="col-md-12 text-center">
             <nav aria-label="Page navigation" class="text-center">
-                <ul class="pagination">
-                    <li class="page-item  active"><a class="page-link" href="#">&lt;</a></li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">&gt;</a></li>
-                </ul>
+                <div id="page" class="pagination"></div>
             </nav>
         </div>
     </div>
 
 </div>
-
+<div layout:fragment="pageJs">
+    <script th:inline="javascript">
+        $(function () {
+            layui.use(['laypage'], function() {
+                var laypage = layui.laypage;
+                laypage.render({
+                    elem: 'page'
+                    , count: /*[[${totalNumber}]]*/
+                    , limit: 8
+                    , groups: 3
+                    , prev: '<'
+                    , next: '>'
+                    ,jump: function(obj){
+                        $.ajax({
+                            type: 'get',
+                            url: /*[[@{/articles/0}]]*/,
+                            data: {
+                                pageNo: obj.curr,
+                                pageSize: obj.limit
+                            },
+                            dataType: "json",
+                            success: function (result) {
+                                console.log(result);
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</div>
 </body>
 </html>

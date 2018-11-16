@@ -1,23 +1,22 @@
 package com.dyl.blog.web.blog;
 
+import com.dyl.blog.support.util.DateUtil;
 import com.dyl.blog.web.blog.dto.Article;
 import com.dyl.blog.web.blog.facade.ArticleJpa;
+import com.dyl.blog.web.sys.dto.ResImg;
 import com.dyl.blog.web.sys.dto.SysUser;
-import org.apache.commons.lang3.StringUtils;
+import com.dyl.blog.web.sys.facade.ResImgJpa;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Description: BlogController
@@ -32,11 +31,16 @@ public class BlogController {
     @Resource
     private ArticleJpa articleJpa;
 
+    @Resource
+    private ResImgJpa resImgJpa;
+
     @PostMapping("/save")
-    public Integer save(Article article, HttpSession session){
+    public Integer save(Article article, HttpSession session) throws Exception{
         SysUser user = (SysUser) session.getAttribute("user");
 
+        article.setResImg(handleImg(article.getContent(), session));
         article.setUser(user);
+        article.setSeeCount(0);
         article.setCreateTime(new Date());
         article.setUpdateTime(new Date());
         article = articleJpa.save(article);
@@ -62,4 +66,34 @@ public class BlogController {
         return respMap;
     }
 
+    private Long handleImg(String content, HttpSession session) throws Exception{
+        List<ResImg> imgList = (List<ResImg>) session.getAttribute("temp_pic");
+
+        Long imgView = null;
+        if (CollectionUtils.isNotEmpty(imgList)){
+            for (Iterator<ResImg> iterator = imgList.iterator(); iterator.hasNext(); ) {
+                ResImg img = iterator.next();
+                String timeStr = DateUtil.dateToString(img.getCreateTime(), "%1$tY%1$tm%1$td %1$tH%1$tM%1$tS");
+                String path = "/image/pic/"  + timeStr + "/" + img.getId();
+
+                if (!content.contains(path)){
+                    resImgJpa.deleteById(img.getId());
+
+                    org.springframework.core.io.Resource res = new UrlResource("file:" + img.getPath());
+                    if (res.exists()) {
+                        res.getFile().delete();
+                    }
+                }else {
+                    if (imgView == null){
+
+                        imgView = img.getId();
+                    }
+                }
+
+                iterator.remove();
+            }
+        }
+
+        return imgView;
+    }
 }

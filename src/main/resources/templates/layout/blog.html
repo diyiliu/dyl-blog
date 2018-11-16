@@ -17,6 +17,7 @@
 
         <!-- Theme Style -->
         <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+        <link rel="stylesheet" th:href="@{/assets/css/dyl-blog.css}">
     </head>
 
     <body>
@@ -35,7 +36,7 @@
                             <!-- <a href="#"><span class="fa fa-search"></span></a> -->
                             <form action="#" class="search-top-form">
                                 <span class="icon fa fa-search"></span>
-                                <input type="text" id="search" placeholder="Type keyword to search...">
+                                <input type="text" id="search" placeholder="搜索 ...">
                             </form>
                         </div>
                     </div>
@@ -57,13 +58,13 @@
                         <ul class="navbar-nav mx-auto">
                             <li th:each="clz: ${classifys}" class="nav-item" th:classappend="${clz.children != null? 'dropdown': ''}">
                                 <a th:if="${clz.children == null}" class="nav-link" th:classappend="${clz.id == active? 'active': ''}"
-                                   th:href="@{/page/{id}(id = ${clz.id})}" th:text="${clz.name}"></a>
+                                   th:href="@{/article/{id}(id = ${clz.id})}" th:text="${clz.name}"></a>
 
                                 <a th:if="${clz.children != null}" class="nav-link dropdown-toggle" th:classappend="${clz.id == active? 'active': ''}"
                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:id="dropdown + ${clz.id}" th:text="${clz.name}"></a>
 
                                 <div th:if="${clz.children != null}"  class="dropdown-menu" aria-labelledby="dropdown04">
-                                    <a th:each="a: ${clz.children}" class="dropdown-item"  th:href="@{/page/{id}(id = ${a.id})}" th:text="${a.name}"></a>
+                                    <a th:each="a: ${clz.children}" class="dropdown-item"  th:href="@{/article/{id}(id = ${a.id})}" th:text="${a.name}"></a>
                                 </div>
                             </li>
                         </ul>
@@ -188,7 +189,7 @@
             <div class="container">
                 <div class="row mb-5">
                     <div class="col-md-4">
-                        <h3>Paragraph</h3>
+                        <h3>资讯</h3>
                         <p>
                             <img th:src="@{/assets/image/img_1.jpg}" alt="Image placeholder" class="img-fluid">
                         </p>
@@ -196,7 +197,7 @@
                     <div class="col-md-6 ml-auto">
                         <div class="row">
                             <div class="col-md-7">
-                                <h3>Latest Post</h3>
+                                <h3>热门</h3>
                                 <div class="post-entry-sidebar">
                                     <ul>
                                         <li>
@@ -230,7 +231,7 @@
 
                             <div class="col-md-4">
                                 <div class="mb-5">
-                                    <h3>Social</h3>
+                                    <h3>社交</h3>
                                     <ul class="list-unstyled footer-social">
                                         <li><a href="#"><span class="fa fa-github"></span> GitHub</a></li>
                                         <li><a href="#"><span class="fa fa-wechat"></span> 微信</a></li>
@@ -269,6 +270,7 @@
         <script th:src="@{/assets/js/jquery.stellar.min.js}"></script>
 
         <script th:src="@{/assets/plugin/bootstrap-4.1.3/js/bootstrap.min.js}"></script>
+        <script th:src="@{/assets/plugin/layui/layui.all.js}"></script>
         <script th:src="@{/assets/js/main.js}"></script>
         <div layout:fragment="pageJs"></div>
     </body>
