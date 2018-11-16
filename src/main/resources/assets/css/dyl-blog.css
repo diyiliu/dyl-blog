@@ -27,3 +27,10 @@
     color: #fff;
     border: 1px solid transparent;
 }
+
+.layui-laypage a.layui-disabled:hover{
+    cursor: not-allowed !important;
+    color: #007bff;
+    background-color: #fff;
+    border: 1px solid #dee2e6
+}
