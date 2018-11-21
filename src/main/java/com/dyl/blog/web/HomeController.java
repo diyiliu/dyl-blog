@@ -3,6 +3,7 @@ package com.dyl.blog.web;
 import com.dyl.blog.support.model.PageData;
 import com.dyl.blog.support.model.RespBody;
 import com.dyl.blog.support.util.DateUtil;
+import com.dyl.blog.support.util.cache.ICache;
 import com.dyl.blog.web.blog.dto.Article;
 import com.dyl.blog.web.blog.dto.Classify;
 import com.dyl.blog.web.blog.facade.ArticleJpa;
@@ -54,34 +55,61 @@ public class HomeController {
     @Resource
     private ArticleJpa articleJpa;
 
+    @Resource
+    private ICache classifyProvider;
+
+
+    @ModelAttribute
+    public void classifyAttribute(Model model){
+
+        model.addAttribute("classifys", classifyProvider.get("classifys"));
+    }
+
     @GetMapping("/")
     public String index(Model model){
-
-        List<Classify> classifyList = classifyJpa.findAll(Sort.by(new String[]{"pid", "sort"}));
-
-        // 根节点
-        List<Classify> rootList = classifyList.stream().filter(a -> a.getPid() == 0).collect(Collectors.toList());
-        // 子节点
-        Map<Long, List<Classify>> listMap = classifyList.stream().filter(a -> a.getPid() > 0)
-                .collect(Collectors.groupingBy(Classify::getPid));
-        for (Classify clz : rootList) {
-            Long id = clz.getId();
-            clz.setChildren(listMap.get(id));
-        }
-
         List articles = articleJpa.findAll();
         model.addAttribute("totalNumber", articles.size());
         model.addAttribute("active", 0);
-        model.addAttribute("classifys", rootList);
 
         return "index";
     }
 
+    @GetMapping("/classify/{id}")
+    public String classify(@PathVariable long id, Model model){
+        if (id == 0){
+
+            return "redirect:/";
+        }
+        Classify classify = classifyJpa.findById(id).get();
+        model.addAttribute(classify);
+
+        List articles = articleJpa.findByClassify_Id(id);
+        model.addAttribute("totalNumber", articles.size());
+        model.addAttribute("active", classify.getId());
+
+        return "classify";
+    }
+
     @ResponseBody
-    @GetMapping("/articles/{clz}")
-    public PageData articleList(PageData pageData, @PathVariable int clz){
+    @GetMapping("/article/{id}")
+    public Article article(@PathVariable long id){
+
+        return articleJpa.findById(id).get();
+    }
+
+
+    @ResponseBody
+    @PostMapping("/classify/{id}")
+    public PageData classify(PageData pageData, @PathVariable long id){
         Pageable pageable = PageRequest.of(pageData.getPageNo() - 1, pageData.getPageSize(), Sort.by(Sort.Direction.DESC, "updateTime"));
-        Page<Article> userPage = articleJpa.findAll(pageable);
+
+        Page<Article> userPage;
+        if (id == 0){
+            userPage = articleJpa.findAll(pageable);
+        }else {
+            userPage = articleJpa.findByClassify_Id(id, pageable);
+        }
+
         pageData.setTotal(userPage.getTotalPages());
         pageData.setData(userPage.getContent());
 

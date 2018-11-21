@@ -1,4 +1,4 @@
-package com.dyl.blog.support.shiro.listener;
+package com.dyl.blog.support.listener;
 
 import com.dyl.blog.web.sys.dto.ResImg;
 import com.dyl.blog.web.sys.facade.ResImgJpa;

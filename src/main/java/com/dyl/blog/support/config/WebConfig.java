@@ -1,10 +1,11 @@
 package com.dyl.blog.support.config;
 
+import com.dyl.blog.support.util.cache.ICache;
+import com.dyl.blog.support.util.cache.ram.RamCacheProvider;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -65,5 +66,11 @@ public class WebConfig {
         });
 
         return objectMapper;
+    }
+
+    @Bean
+    public ICache classifyProvider(){
+
+        return new RamCacheProvider();
     }
 }

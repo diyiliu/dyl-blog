@@ -21,16 +21,12 @@
     </head>
 
     <body>
-
         <header role="banner">
             <div class="top-bar">
                 <div class="container">
                     <div class="row">
                         <div class="col-9 social">
-                            <a href="https://www.github.com/diyiliu"><span class="fa fa-github"></span></a>
-                            <a href="#"><span class="fa fa-wechat"></span></a>
-                            <a href="#"><span class="fa fa-qq"></span></a>
-                            <a href="#"><span class="fa fa-weibo"></span></a>
+                            <a href="http://www.diyiliu.cc">DYL</a>
                         </div>
                         <div class="col-3 search-top">
                             <!-- <a href="#"><span class="fa fa-search"></span></a> -->
@@ -47,7 +43,6 @@
                 <div class="row pt-5">
                     <div class="col-12 text-center">
                         <a class="absolute-toggle d-block d-md-none" data-toggle="collapse" href="#navbarMenu" role="button" aria-expanded="false" aria-controls="navbarMenu"><span class="burger-lines"></span></a>
-                        <h1 class="site-logo"><a href="index.html">Dyl</a></h1>
                     </div>
                 </div>
             </div>
@@ -58,13 +53,13 @@
                         <ul class="navbar-nav mx-auto">
                             <li th:each="clz: ${classifys}" class="nav-item" th:classappend="${clz.children != null? 'dropdown': ''}">
                                 <a th:if="${clz.children == null}" class="nav-link" th:classappend="${clz.id == active? 'active': ''}"
-                                   th:href="@{/article/{id}(id = ${clz.id})}" th:text="${clz.name}"></a>
+                                   th:href="@{/classify/{id}(id = ${clz.id})}" th:text="${clz.name}"></a>
 
                                 <a th:if="${clz.children != null}" class="nav-link dropdown-toggle" th:classappend="${clz.id == active? 'active': ''}"
                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:id="dropdown + ${clz.id}" th:text="${clz.name}"></a>
 
                                 <div th:if="${clz.children != null}"  class="dropdown-menu" aria-labelledby="dropdown04">
-                                    <a th:each="a: ${clz.children}" class="dropdown-item"  th:href="@{/article/{id}(id = ${a.id})}" th:text="${a.name}"></a>
+                                    <a th:each="a: ${clz.children}" class="dropdown-item"  th:href="@{/classify/{id}(id = ${a.id})}" th:text="${a.name}"></a>
                                 </div>
                             </li>
                         </ul>
@@ -74,16 +69,12 @@
         </header>
         <!-- END header -->
 
-        <section layout:fragment="banner"></section>
-        <section class="site-section py-sm">
+        <section layout:fragment="slider"></section>
+        <section class="site-section">
             <div class="container">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h2 layout:fragment="classify"></h2>
-                    </div>
-                </div>
+                <div  layout:fragment="title"></div>
                 <div class="row blog-entries">
-                    <div  layout:fragment="main"></div>
+                    <div layout:fragment="main"></div>
                     <!-- END main-content -->
 
                     <div class="col-md-12 col-lg-4 sidebar">
@@ -231,12 +222,10 @@
 
                             <div class="col-md-4">
                                 <div class="mb-5">
-                                    <h3>社交</h3>
+                                    <h3>友链</h3>
                                     <ul class="list-unstyled footer-social">
-                                        <li><a href="#"><span class="fa fa-github"></span> GitHub</a></li>
-                                        <li><a href="#"><span class="fa fa-wechat"></span> 微信</a></li>
-                                        <li><a href="#"><span class="fa fa-qq"></span> QQ</a></li>
-                                        <li><a href="#"><span class="fa fa-weibo"></span> 微博</a></li>
+                                        <li><a href="http://hao.diyiliu.cc" target="_blank">程序员导航</a></li>
+                                        <li><a href="http://www.dyltool.com" target="_blank">开发者工具</a></li>
                                     </ul>
                                 </div>
                             </div>
