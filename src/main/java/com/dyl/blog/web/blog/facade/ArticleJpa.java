@@ -1,7 +1,11 @@
 package com.dyl.blog.web.blog.facade;
 
 import com.dyl.blog.web.blog.dto.Article;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 
 /**
  * Description: ArticleJpa
@@ -10,4 +14,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface ArticleJpa extends JpaRepository<Article, Long> {
 
+    Page<Article> findByClassify_Id(long id, Pageable pageable);
+
+    List<Article> findByClassify_Id(long id);
 }

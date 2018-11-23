@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{layout/blog}">
+<head>
+    <title>帝一流博客 - 学习笔记</title>
+</head>
+<body>
+
+<div layout:fragment="title" class="row mb-4">
+    <div class="col-md-6">
+        <h2 class="mb-4" th:text="'#  ' + ${classify.name}"></h2>
+    </div>
+</div>
+<div layout:fragment="main" class="col-md-12 col-lg-8 main-content">
+    <div class="row mb-5" id="article"></div>
+    <div class="row" th:classappend="${totalNumber < 9? 'collapse': ''}">
+        <div class="col-md-12 text-center">
+            <nav aria-label="Page navigation" class="text-center">
+                <div id="page" class="pagination"></div>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div layout:fragment="pageJs">
+    <script th:inline="javascript">
+        $(function () {
+            layui.use(['laypage'], function() {
+                var laypage = layui.laypage;
+                laypage.render({
+                    elem: 'page'
+                    , count: /*[[${totalNumber}]]*/
+                    , limit: 8
+                    , groups: 3
+                    , prev: '<'
+                    , next: '>'
+                    ,jump: function(obj){
+                        $.ajax({
+                            type: 'post',
+                            url: /*[[@{/classify/0}]]*/,
+                            data: {
+                                pageNo: obj.curr,
+                                pageSize: obj.limit
+                            },
+                            dataType: "json",
+                            success: function (result) {
+                                var data = result.data;
+                                var path = /*[[@{/}]]*/;
+                                if (data){
+                                    var str = '<div class="col-md-12">';
+                                    for (var i = 0; i < data.length; i++){
+                                        var art = data[i];
+
+                                        var main = '';
+                                        if (art.resImg) {
+                                            var imgPath = path +  'image/pic/2018/' + art.resImg;
+                                            main =  '<div class="image element-animate fadeIn element-animated" data-animate-effect="fadeIn" style="background-image: url(' + imgPath + ');"></div>';
+                                        }else {
+                                            main = '<div class="image element-animate fadeIn element-animated" data-animate-effect="fadeIn" style="border: 1px solid #e6e6e6;"><p class="overview">'
+                                                 + art.overview + '</p></div>';
+                                        }
+
+                                        var artPath = path + 'article/' + art.id;
+                                        str += '                <div class="post-entry-horzontal">' +
+                                            '                  <a href="' + artPath + '">' + main +
+                                            '                    <span class="text">' +
+                                            '                      <div class="post-meta">' +
+                                            '                        <span class="category">Food</span>' +
+                                            '                        <span class="mr-2">March 15, 2018 </span> &bullet;' +
+                                            '                        <span class="ml-2"><span class="fa fa-comments"></span> 3</span>' +
+                                            '                      </div>' +
+                                            '                      <h2>' + art.title + '</h2>' +
+                                            '                    </span>' +
+                                            '                  </a>' +
+                                            '                </div>';
+                                    }
+
+                                    $('#article').html(str + '</div>');
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</div>
+</body>
+</html>

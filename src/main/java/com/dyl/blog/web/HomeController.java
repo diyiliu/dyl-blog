@@ -1,19 +1,28 @@
 package com.dyl.blog.web;
 
+import com.dyl.blog.support.model.PageData;
 import com.dyl.blog.support.model.RespBody;
+import com.dyl.blog.support.util.DateUtil;
+import com.dyl.blog.support.util.cache.ICache;
+import com.dyl.blog.web.blog.dto.Article;
+import com.dyl.blog.web.blog.dto.Classify;
+import com.dyl.blog.web.blog.facade.ArticleJpa;
+import com.dyl.blog.web.blog.facade.ClassifyJpa;
 import com.dyl.blog.web.sys.dto.ResImg;
 import com.dyl.blog.web.sys.dto.SysUser;
 import com.dyl.blog.web.sys.facade.ResImgJpa;
 import org.apache.commons.io.FileUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -22,6 +31,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Description: HomeController
@@ -38,12 +49,74 @@ public class HomeController {
     @Resource
     private ResImgJpa resImgJpa;
 
-    @GetMapping("/")
-    public String index(){
+    @Resource
+    private ClassifyJpa classifyJpa;
+
+    @Resource
+    private ArticleJpa articleJpa;
+
+    @Resource
+    private ICache classifyProvider;
 
 
-        return "console/login";
+    @ModelAttribute
+    public void classifyAttribute(Model model){
+
+        model.addAttribute("classifys", classifyProvider.get("classifys"));
     }
+
+    @GetMapping("/")
+    public String index(Model model){
+        List articles = articleJpa.findAll();
+        model.addAttribute("totalNumber", articles.size());
+        model.addAttribute("active", 0);
+
+        return "index";
+    }
+
+    @GetMapping("/classify/{id}")
+    public String classify(@PathVariable long id, Model model){
+        if (id == 0){
+
+            return "redirect:/";
+        }
+        Classify classify = classifyJpa.findById(id).get();
+        model.addAttribute("classify", classify);
+
+        List articles = articleJpa.findByClassify_Id(id);
+        model.addAttribute("totalNumber", articles.size());
+        model.addAttribute("active", classify.getId());
+
+        return "classify";
+    }
+
+    @GetMapping("/article/{id}")
+    public String article(@PathVariable long id, Model model){
+        Article article = articleJpa.findById(id).get();
+        model.addAttribute("article", article);
+
+        return "article";
+    }
+
+
+    @ResponseBody
+    @PostMapping("/classify/{id}")
+    public PageData classify(PageData pageData, @PathVariable long id){
+        Pageable pageable = PageRequest.of(pageData.getPageNo() - 1, pageData.getPageSize(), Sort.by(Sort.Direction.DESC, "updateTime"));
+
+        Page<Article> userPage;
+        if (id == 0){
+            userPage = articleJpa.findAll(pageable);
+        }else {
+            userPage = articleJpa.findByClassify_Id(id, pageable);
+        }
+
+        pageData.setTotal(userPage.getTotalPages());
+        pageData.setData(userPage.getContent());
+
+        return pageData;
+    }
+
 
     @ResponseBody
     @PostMapping("/image/upload")
@@ -71,15 +144,17 @@ public class HomeController {
         img = resImgJpa.save(img);
 
         if (img != null){
-            List<Long> pictures = (List<Long>) session.getAttribute("temp_pic");
-            if (pictures == null) {
-                pictures = new ArrayList();
-                session.setAttribute("temp_pic", pictures);
+            List imgList = (List) session.getAttribute("temp_pic");
+            if (imgList == null) {
+                imgList = new ArrayList();
+                session.setAttribute("temp_pic", imgList);
             }
-            pictures.add(img.getId());
+            imgList.add(img);
+
+            String timeStr = DateUtil.dateToString(img.getCreateTime(), "%1$tY%1$tm%1$td %1$tH%1$tM%1$tS");
 
             respBody.setStatus(1);
-            respBody.setData("/image/pic/"  + img.getId());
+            respBody.setData("/image/pic/"  + timeStr + "/" + img.getId());
         }else {
             respBody.setStatus(0);
             respBody.setMessage("图片保存失败");
@@ -89,8 +164,8 @@ public class HomeController {
     }
 
     @ResponseBody
-    @GetMapping("/image/pic/{id}")
-    public ResponseEntity showPicture(@PathVariable long id) throws Exception {
+    @GetMapping("/image/pic/{time}/{id}")
+    public ResponseEntity showPicture(@PathVariable long id, @PathVariable String time) throws Exception {
         ResImg img = resImgJpa.findById(id).get();
         if (img != null){
             org.springframework.core.io.Resource imgRes = new UrlResource("file:" + img.getPath());

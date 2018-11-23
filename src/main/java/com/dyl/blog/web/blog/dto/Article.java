@@ -29,9 +29,15 @@ public class Article {
 
     private String content;
 
+    private String overview;
+
+    private Long resImg;
+
     private Integer type;
 
-    private Integer classify;
+    @ManyToOne
+    @JoinColumn(name = "classify", referencedColumnName = "id")
+    private Classify classify;
 
     private String tags;
 

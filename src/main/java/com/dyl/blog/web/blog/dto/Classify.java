@@ -3,6 +3,7 @@ package com.dyl.blog.web.blog.dto;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Description: Classify
@@ -28,4 +29,7 @@ public class Classify {
     private String note;
 
     private Integer sort;
+
+    @Transient
+    private List<Classify> children;
 }

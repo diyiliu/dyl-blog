@@ -5,7 +5,7 @@
 <head>
     <title>帝一流博客 - 后台管理</title>
 
-    <link th:href="@{/assets/plugin/summernote-0.8.9/summernote-bs4.css}" type="text/css" rel="stylesheet">
+    <link th:href="@{/assets/plugin/summernote-0.8.10/summernote-bs4.css}" type="text/css" rel="stylesheet">
 </head>
 
 
@@ -46,11 +46,11 @@
                 <div class="card-body ">
                     <form class="form-horizontal" id="myForm">
                         <div class="row">
-                            <label class="col-md-2 col-form-label">博客分类</label>
+                            <label class="col-md-2 col-form-label">所属分类</label>
                             <div class="col-md-10">
                                 <select class="selectpicker form-control"
                                         data-style="select-with-transition"
-                                        title="选择分类" data-size="5" name="classify">
+                                        title="选择分类" data-size="5" name="classify.id">
                                     <option value="10">物联网</option>
                                     <option value="11">大数据</option>
                                     <option value="12">前端开发</option>
@@ -74,18 +74,18 @@
                         <div class="row">
                             <label class="col-md-2 col-form-label">内容标签</label>
                             <div class="col-md-10">
-                                <div class="form-group">
+                                <div class="form-group tags" style="padding-bottom: 0;border-bottom: 1px solid #d2d2d2;">
                                     <input type="text" class="form-control tagsinput"
                                            data-role="tagsinput" data-color="info" name="tags">
                                 </div>
                             </div>
                         </div>
                         <div class="row">
-                            <label class="col-md-2 col-form-label">仅自己可见</label>
+                            <label class="col-md-2 col-form-label">公开</label>
                             <div class="col-md-10">
                                 <div class="form-group togglebutton">
                                     <label>
-                                        <input type="checkbox" value="0" name="open">
+                                        <input type="checkbox" checked value="1" name="open">
                                         <span class="toggle"></span>
                                     </label>
                                 </div>
@@ -107,14 +107,26 @@
 </div>
 
 <div layout:fragment="pageJs">
-    <script th:src="@{/assets/plugin/summernote-0.8.9/summernote-bs4.min.js}"></script>
-    <script th:src="@{/assets/plugin/summernote-0.8.9/lang/summernote-zh-CN.js}"></script>
+    <script th:src="@{/assets/plugin/summernote-0.8.10/summernote-bs4.js}"></script>
+    <script th:src="@{/assets/plugin/summernote-0.8.10/lang/summernote-zh-CN.js}"></script>
 
     <script th:inline="javascript">
         $(function () {
+            var height = $("div.main-panel").height() - 510;
             $('#summernote').summernote({
                 lang: 'zh-CN',
-                height: 430,
+                height: height,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline', 'clear']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['fontsize', ['fontsize']],
+                    ['height', ['height']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'picture']],
+                    ['view', ['fullscreen']]
+                ],
                 callbacks: {
                     onImageUpload: function (files) {
                         var formData = new FormData();
@@ -147,6 +159,7 @@
             formData.append('title', $('#title').val());
             formData.append('status', i);
             formData.append('content', markupStr);
+            formData.append('overview', $(markupStr).text().substr(0, 100));
             $.ajax({
                 type: 'post',
                 url: /*[[@{/console/blog/save/}]]*/,

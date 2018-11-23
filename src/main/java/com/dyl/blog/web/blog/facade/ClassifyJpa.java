@@ -3,6 +3,8 @@ package com.dyl.blog.web.blog.facade;
 import com.dyl.blog.web.blog.dto.Classify;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 /**
  * Description: ClassifyJpa
  * Author: DIYILIU
@@ -10,4 +12,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface ClassifyJpa extends JpaRepository<Classify, Long> {
 
+    List<Classify> findByPidOrderBySort(Long pid);
 }
