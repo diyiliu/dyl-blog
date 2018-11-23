@@ -83,7 +83,7 @@
                                         var main = '';
                                         if (art.resImg) {
                                             var imgPath = path +  'image/pic/2018/' + art.resImg;
-                                            main =  ' <img src="' + imgPath + '" alt="Image placeholder">';
+                                            main = '<div class="image" style="background-image: url(' + imgPath + ')"></div>';
                                         }else {
                                             main = ' <div class="bio" style="height: 234px">' + art.overview + ' &bullet;&bullet;&bullet; </div>'
                                         }

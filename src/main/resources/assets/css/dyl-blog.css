@@ -53,6 +53,13 @@
     overflow: hidden;
 }
 
+.blog-entries .blog-entry .image{
+    width: 100%;
+    height: 234px;
+    background-size: cover;
+    background-position: center center;
+}
+
 .footer-social li a{
     font-size: 0.7em;
 }
