@@ -22,6 +22,10 @@
     border: 1px solid transparent;
 }
 
+.layui-laypage .layui-laypage-curr em{
+    font-style: normal;
+}
+
 .layui-laypage  a:hover {
     background: #007bff;
     color: #fff;
@@ -33,4 +37,22 @@
     color: #007bff;
     background-color: #fff;
     border: 1px solid #dee2e6
+}
+
+.blog-entries  .post-entry-horzontal a .overview{
+    width: 200px;
+    height: 142px;
+    overflow: hidden;
+    font-size: 14px;
+    padding: 10px 15px;
+}
+
+.blog-entries .post-entry-horzontal a .text{
+    width: 530px;
+    height: 172px;
+    overflow: hidden;
+}
+
+.footer-social li a{
+    font-size: 0.7em;
 }

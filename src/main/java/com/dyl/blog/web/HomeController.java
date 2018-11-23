@@ -81,7 +81,7 @@ public class HomeController {
             return "redirect:/";
         }
         Classify classify = classifyJpa.findById(id).get();
-        model.addAttribute(classify);
+        model.addAttribute("classify", classify);
 
         List articles = articleJpa.findByClassify_Id(id);
         model.addAttribute("totalNumber", articles.size());
@@ -90,11 +90,12 @@ public class HomeController {
         return "classify";
     }
 
-    @ResponseBody
     @GetMapping("/article/{id}")
-    public Article article(@PathVariable long id){
+    public String article(@PathVariable long id, Model model){
+        Article article = articleJpa.findById(id).get();
+        model.addAttribute("article", article);
 
-        return articleJpa.findById(id).get();
+        return "article";
     }
 
 

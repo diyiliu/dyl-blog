@@ -7,14 +7,14 @@
 </head>
 <body>
 
-<div layout:fragment="title" class="row">
+<div layout:fragment="title" class="row mb-4">
     <div class="col-md-6">
-        <h2 class="mb-4">最新文章</h2>
+        <h2 class="mb-4" th:text="'#  ' + ${classify.name}"></h2>
     </div>
 </div>
 <div layout:fragment="main" class="col-md-12 col-lg-8 main-content">
-    <div class="row" id="article"></div>
-    <div class="row">
+    <div class="row mb-5" id="article"></div>
+    <div class="row" th:classappend="${totalNumber < 9? 'collapse': ''}">
         <div class="col-md-12 text-center">
             <nav aria-label="Page navigation" class="text-center">
                 <div id="page" class="pagination"></div>
@@ -48,34 +48,35 @@
                                 var data = result.data;
                                 var path = /*[[@{/}]]*/;
                                 if (data){
-                                    var str = '';
+                                    var str = '<div class="col-md-12">';
                                     for (var i = 0; i < data.length; i++){
                                         var art = data[i];
 
                                         var main = '';
                                         if (art.resImg) {
                                             var imgPath = path +  'image/pic/2018/' + art.resImg;
-                                            main =  ' <img src="' + imgPath + '" alt="Image placeholder">';
+                                            main =  '<div class="image element-animate fadeIn element-animated" data-animate-effect="fadeIn" style="background-image: url(' + imgPath + ');"></div>';
                                         }else {
-                                            main = ' <div class="bio" style="height: 234px">' + art.overview + ' &bullet;&bullet;&bullet; </div>'
+                                            main = '<div class="image element-animate fadeIn element-animated" data-animate-effect="fadeIn" style="border: 1px solid #e6e6e6;"><p class="overview">'
+                                                 + art.overview + '</p></div>';
                                         }
 
                                         var artPath = path + 'article/' + art.id;
-                                        str += '<div class="col-md-6">' +
-                                            '            <a href="' + artPath + '" class="blog-entry element-animate fadeIn element-animated" data-animate-effect="fadeIn">' + main +
-                                            '                <div class="blog-content-body">' +
-                                            '                    <div class="post-meta">' +
-                                            '                        <span class="category">Gradle</span>' +
-                                            '                        <span class="mr-2">03-15, 2018 </span> &bullet;' +
-                                            '                        <span class="ml-2"><span class="fa fa-eye"></span> 3</span>' +
-                                            '                    </div>' +
-                                            '                    <h2>' + art.title + '</h2>' +
-                                            '                </div>' +
-                                            '            </a>' +
-                                            '        </div>'
+                                        str += '                <div class="post-entry-horzontal">' +
+                                            '                  <a href="' + artPath + '">' + main +
+                                            '                    <span class="text">' +
+                                            '                      <div class="post-meta">' +
+                                            '                        <span class="category">Food</span>' +
+                                            '                        <span class="mr-2">March 15, 2018 </span> &bullet;' +
+                                            '                        <span class="ml-2"><span class="fa fa-comments"></span> 3</span>' +
+                                            '                      </div>' +
+                                            '                      <h2>' + art.title + '</h2>' +
+                                            '                    </span>' +
+                                            '                  </a>' +
+                                            '                </div>';
                                     }
 
-                                    $('#article').html(str);
+                                    $('#article').html(str + '</div>');
                                 }
                             }
                         });
