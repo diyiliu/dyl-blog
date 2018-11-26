@@ -28,6 +28,8 @@
         $(function () {
             layui.use(['laypage'], function() {
                 var laypage = layui.laypage;
+                var path = /*[[@{/classify/}]]*/;
+                var clzId = /*[[${classify.id}]]*/;
                 laypage.render({
                     elem: 'page'
                     , count: /*[[${totalNumber}]]*/
@@ -38,7 +40,7 @@
                     ,jump: function(obj){
                         $.ajax({
                             type: 'post',
-                            url: /*[[@{/classify/0}]]*/,
+                            url: path + clzId,
                             data: {
                                 pageNo: obj.curr,
                                 pageSize: obj.limit
@@ -67,8 +69,8 @@
                                             '                    <span class="text">' +
                                             '                      <div class="post-meta">' +
                                             '                        <span class="category">Food</span>' +
-                                            '                        <span class="mr-2">March 15, 2018 </span> &bullet;' +
-                                            '                        <span class="ml-2"><span class="fa fa-comments"></span> 3</span>' +
+                                            '                        <span class="mr-2">' + art.createTime + '</span> &bullet;' +
+                                            '                        <span class="ml-2"><span class="fa fa-eye"></span> ' + art.seeCount + '</span>' +
                                             '                      </div>' +
                                             '                      <h2>' + art.title + '</h2>' +
                                             '                    </span>' +

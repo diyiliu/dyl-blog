@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
 
