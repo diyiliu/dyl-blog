@@ -55,18 +55,30 @@ public class HomeController {
     @Resource
     private ArticleJpa articleJpa;
 
-    @Resource
-    private ICache classifyProvider;
-
-
     @ModelAttribute
-    public void classifyAttribute(Model model){
+    public void classifyAttribute(Model model) {
+        List<Classify> classifyList = classifyJpa.findAll(Sort.by(new String[]{"pid", "sort"}));
+        classifyList.forEach(e -> {
+            List articleList = articleJpa.findByClassify_Id(e.getId());
+            e.setCount(articleList.size());
+        });
 
-        model.addAttribute("classifys", classifyProvider.get("classifys"));
+        // 根节点
+        List<Classify> rootList = classifyList.stream().filter(a -> a.getPid() == 0).collect(Collectors.toList());
+        // 子节点
+        Map<Long, List<Classify>> listMap = classifyList.stream().filter(a -> a.getPid() > 0)
+                .collect(Collectors.groupingBy(Classify::getPid));
+        for (Classify clz : rootList) {
+            Long id = clz.getId();
+            clz.setChildren(listMap.get(id));
+        }
+
+        model.addAttribute("classifys", rootList);
     }
 
+
     @GetMapping("/")
-    public String index(Model model){
+    public String index(Model model) {
         List articles = articleJpa.findAll();
         model.addAttribute("totalNumber", articles.size());
         model.addAttribute("active", 0);
@@ -75,8 +87,8 @@ public class HomeController {
     }
 
     @GetMapping("/classify/{id}")
-    public String classify(@PathVariable long id, Model model){
-        if (id == 0){
+    public String classify(@PathVariable long id, Model model) {
+        if (id == 0) {
 
             return "redirect:/";
         }
@@ -91,7 +103,7 @@ public class HomeController {
     }
 
     @GetMapping("/article/{id}")
-    public String article(@PathVariable long id, Model model){
+    public String article(@PathVariable long id, Model model) {
         Article article = articleJpa.findById(id).get();
         model.addAttribute("article", article);
 
@@ -101,13 +113,13 @@ public class HomeController {
 
     @ResponseBody
     @PostMapping("/classify/{id}")
-    public PageData classify(PageData pageData, @PathVariable long id){
+    public PageData classify(PageData pageData, @PathVariable long id) {
         Pageable pageable = PageRequest.of(pageData.getPageNo() - 1, pageData.getPageSize(), Sort.by(Sort.Direction.DESC, "updateTime"));
 
         Page<Article> userPage;
-        if (id == 0){
+        if (id == 0) {
             userPage = articleJpa.findAll(pageable);
-        }else {
+        } else {
             userPage = articleJpa.findByClassify_Id(id, pageable);
         }
 
@@ -143,7 +155,7 @@ public class HomeController {
         // 保存图片路径到数据库
         img = resImgJpa.save(img);
 
-        if (img != null){
+        if (img != null) {
             List imgList = (List) session.getAttribute("temp_pic");
             if (imgList == null) {
                 imgList = new ArrayList();
@@ -154,8 +166,8 @@ public class HomeController {
             String timeStr = DateUtil.dateToString(img.getCreateTime(), "%1$tY%1$tm%1$td %1$tH%1$tM%1$tS");
 
             respBody.setStatus(1);
-            respBody.setData("/image/pic/"  + timeStr + "/" + img.getId());
-        }else {
+            respBody.setData("/image/pic/" + timeStr + "/" + img.getId());
+        } else {
             respBody.setStatus(0);
             respBody.setMessage("图片保存失败");
         }
@@ -167,7 +179,7 @@ public class HomeController {
     @GetMapping("/image/pic/{time}/{id}")
     public ResponseEntity showPicture(@PathVariable long id, @PathVariable String time) throws Exception {
         ResImg img = resImgJpa.findById(id).get();
-        if (img != null){
+        if (img != null) {
             org.springframework.core.io.Resource imgRes = new UrlResource("file:" + img.getPath());
 
             return ResponseEntity.ok(FileUtils.readFileToByteArray(imgRes.getFile()));

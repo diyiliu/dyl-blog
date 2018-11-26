@@ -28,8 +28,14 @@ public class Classify {
 
     private String note;
 
+    /** 0: 节点; 1: 类别;**/
+    private Integer type;
+
     private Integer sort;
 
     @Transient
     private List<Classify> children;
+
+    @Transient
+    private Integer count;
 }

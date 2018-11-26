@@ -2,7 +2,9 @@ package com.dyl.blog.web.blog;
 
 import com.dyl.blog.support.util.DateUtil;
 import com.dyl.blog.web.blog.dto.Article;
+import com.dyl.blog.web.blog.dto.Classify;
 import com.dyl.blog.web.blog.facade.ArticleJpa;
+import com.dyl.blog.web.blog.facade.ClassifyJpa;
 import com.dyl.blog.web.sys.dto.ResImg;
 import com.dyl.blog.web.sys.dto.SysUser;
 import com.dyl.blog.web.sys.facade.ResImgJpa;
@@ -12,11 +14,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Description: BlogController

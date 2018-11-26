@@ -83,10 +83,11 @@
                             <div class="bio text-center">
                                 <img th:src="@{/assets/image/person_1.jpg}" alt="Image Placeholder" class="img-fluid">
                                 <div class="bio-body">
-                                    <h2>帝一流</h2>
-                                    <p>Java开发程序员</p>
-                                    <p>不安于现状，爱折腾的码农。</p>
-                                    <p>目前从事工业物联网，车载GPS智能硬件相关工作。</p>
+                                    <h2>DYL(帝一流)</h2>
+                                    <p>
+                                        程序员一枚<br>
+                                        不安于现状，爱折腾的码农
+                                    </p>
                                     <p><a href="#" class="btn btn-primary btn-sm">个人简历</a></p>
                                     <p class="social">
                                         <a href="#" class="p-2"><span class="fa fa-github"></span></a>
@@ -144,11 +145,9 @@
                         <div class="sidebar-box">
                             <h3 class="heading">分类</h3>
                             <ul class="categories">
-                                <li><a href="#">编程 <span>(12)</span></a></li>
-                                <li><a href="#">Linux <span>(22)</span></a></li>
-                                <li><a href="#">数据库 <span>(37)</span></a></li>
-                                <li><a href="#">HTML <span>(42)</span></a></li>
-                                <li><a href="#">设计 <span>(14)</span></a></li>
+                                <li th:each="clz: ${classifys}" th:if="${clz.type == 1}">
+                                    <a th:href="@{/classify/{id}(id = ${clz.id})}" th:utext="|${clz.name}<span>(${clz.count})</span>|"></a>
+                                </li>
                             </ul>
                         </div>
                         <!-- END sidebar-box -->
