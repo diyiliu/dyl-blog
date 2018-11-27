@@ -17,4 +17,6 @@ public interface ArticleJpa extends JpaRepository<Article, Long> {
     Page<Article> findByClassify_Id(long id, Pageable pageable);
 
     List<Article> findByClassify_Id(long id);
+
+    Page<Article> findByResImgIsNotNull(Pageable pageable);
 }

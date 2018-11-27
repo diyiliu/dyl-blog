@@ -11,8 +11,8 @@
     <h1 class="mb-4" th:text="${article.title}"></h1>
     <div class="post-meta">
         <span class="category">Food</span>
-        <span class="mr-2" th:text="${article.createTime}"></span> &bullet;
-        <span class="ml-2" th:utext="|<span class='fa fa-eye'></span>${article.seeCount}|"></span>
+        <span class="mr-2" th:text="${article.createTimeStr}"></span> &bullet;
+        <span class="ml-2" th:utext="|<span class='fa fa-eye'></span>&nbsp;${article.seeCount}|"></span>
     </div>
     <div class="post-content-body" th:utext="${article.content}"></div>
 </div>

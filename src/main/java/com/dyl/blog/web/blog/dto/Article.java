@@ -1,5 +1,6 @@
 package com.dyl.blog.web.blog.dto;
 
+import com.dyl.blog.support.util.DateUtil;
 import com.dyl.blog.web.sys.dto.SysUser;
 import lombok.Data;
 
@@ -52,4 +53,9 @@ public class Article {
     private Integer seeCount;
 
     private Integer status;
+
+    public String getCreateTimeStr() {
+
+        return DateUtil.dateToString(createTime, "%1$tY-%1$tm-%1$td");
+    }
 }

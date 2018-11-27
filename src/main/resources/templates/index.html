@@ -14,7 +14,8 @@
 
                 <div class="owl-carousel owl-theme home-slider">
                     <div>
-                        <a href="javascript: void(0);" class="a-block d-flex align-items-center height-lg" style="background-image: url('assets/image/img_1.jpg'); ">
+                        <a href="javascript: void(0);" class="a-block d-flex align-items-center height-lg"
+                           th:style="'background-image: url(' + @{/assets/image/img_1.jpg}  + ');'">
                             <div class="text half-to-full">
                                 <h3>格局决定结局</h3>
                                 <p>从零开始，重新出发</p>
@@ -22,7 +23,8 @@
                         </a>
                     </div>
                     <div>
-                        <a href="javascript: void(0);" class="a-block d-flex align-items-center height-lg" style="background-image: url('assets/image/img_2.jpg'); ">
+                        <a href="javascript: void(0);" class="a-block d-flex align-items-center height-lg"
+                           th:style="'background-image: url(' + @{/assets/image/img_2.jpg}  + ');'">
                             <div class="text half-to-full">
                                 <h3>完成比完美更重要</h3>
                                 <p>积极进去，有始有终</p>
@@ -54,6 +56,8 @@
 <div layout:fragment="pageJs">
     <script th:inline="javascript">
         $(function () {
+            $('[data-toggle="popover"]').popover();
+
             layui.use(['laypage'], function() {
                 var laypage = layui.laypage;
                 laypage.render({

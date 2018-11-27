@@ -72,10 +72,18 @@ public class HomeController {
             Long id = clz.getId();
             clz.setChildren(listMap.get(id));
         }
-
         model.addAttribute("classifys", rootList);
-    }
 
+        // 推荐
+        Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, new String[]{"isTop", "updateTime"}));
+        Page<Article> articlePage = articleJpa.findByResImgIsNotNull(pageable);
+        model.addAttribute("tops", articlePage.getContent());
+
+        // 热门
+        pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "seeCount"));
+        articlePage = articleJpa.findByResImgIsNotNull(pageable);
+        model.addAttribute("hots", articlePage.getContent());
+    }
 
     @GetMapping("/")
     public String index(Model model) {
@@ -116,15 +124,15 @@ public class HomeController {
     public PageData classify(PageData pageData, @PathVariable long id) {
         Pageable pageable = PageRequest.of(pageData.getPageNo() - 1, pageData.getPageSize(), Sort.by(Sort.Direction.DESC, "updateTime"));
 
-        Page<Article> userPage;
+        Page<Article> articlePage;
         if (id == 0) {
-            userPage = articleJpa.findAll(pageable);
+            articlePage = articleJpa.findAll(pageable);
         } else {
-            userPage = articleJpa.findByClassify_Id(id, pageable);
+            articlePage = articleJpa.findByClassify_Id(id, pageable);
         }
 
-        pageData.setTotal(userPage.getTotalPages());
-        pageData.setData(userPage.getContent());
+        pageData.setTotal(articlePage.getTotalPages());
+        pageData.setData(articlePage.getContent());
 
         return pageData;
     }

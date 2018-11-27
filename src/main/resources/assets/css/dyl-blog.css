@@ -63,3 +63,11 @@
 .footer-social li a{
     font-size: 0.7em;
 }
+
+.dropdown-menu .myWechat{
+    width: 215px;
+    height: 215px;
+    background-image: url('/assets/image/wx.jpg');
+    background-size: cover;
+    background-position: top center;
+}
