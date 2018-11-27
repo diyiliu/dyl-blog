@@ -2,25 +2,27 @@ package com.dyl.blog.web.blog;
 
 import com.dyl.blog.support.util.DateUtil;
 import com.dyl.blog.web.blog.dto.Article;
-import com.dyl.blog.web.blog.dto.Classify;
+import com.dyl.blog.web.blog.dto.Tag;
 import com.dyl.blog.web.blog.facade.ArticleJpa;
-import com.dyl.blog.web.blog.facade.ClassifyJpa;
+import com.dyl.blog.web.blog.facade.TagJpa;
 import com.dyl.blog.web.sys.dto.ResImg;
 import com.dyl.blog.web.sys.dto.SysUser;
 import com.dyl.blog.web.sys.facade.ResImgJpa;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Description: BlogController
@@ -34,6 +36,9 @@ public class BlogController {
 
     @Resource
     private ArticleJpa articleJpa;
+
+    @Resource
+    private TagJpa tagJpa;
 
     @Resource
     private ResImgJpa resImgJpa;
@@ -51,6 +56,21 @@ public class BlogController {
         if (article == null){
 
             return 0;
+        }
+
+        long id = article.getId();
+        if (StringUtils.isNotEmpty(article.getTags())){
+            String[] tagArray = article.getTags().split(",");
+            List<Tag> tagList = new ArrayList();
+            int i = 0;
+            for (String tag: tagArray){
+                Tag t = new Tag();
+                t.setArticleId(id);
+                t.setName(tag);
+                t.setSort(++i);
+                tagList.add(t);
+            }
+            tagJpa.saveAll(tagList);
         }
 
         return 1;

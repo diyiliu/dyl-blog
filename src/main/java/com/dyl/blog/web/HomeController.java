@@ -5,8 +5,10 @@ import com.dyl.blog.support.model.RespBody;
 import com.dyl.blog.support.util.DateUtil;
 import com.dyl.blog.web.blog.dto.Article;
 import com.dyl.blog.web.blog.dto.Classify;
+import com.dyl.blog.web.blog.dto.Tag;
 import com.dyl.blog.web.blog.facade.ArticleJpa;
 import com.dyl.blog.web.blog.facade.ClassifyJpa;
+import com.dyl.blog.web.blog.facade.TagJpa;
 import com.dyl.blog.web.sys.dto.ResImg;
 import com.dyl.blog.web.sys.dto.SysUser;
 import com.dyl.blog.web.sys.facade.ResImgJpa;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,6 +57,9 @@ public class HomeController {
     @Resource
     private ArticleJpa articleJpa;
 
+    @Resource
+    private TagJpa tagJpa;
+
     @ModelAttribute
     public void classifyAttribute(Model model) {
         List<Classify> classifyList = classifyJpa.findAll(Sort.by(new String[]{"pid", "sort"}));
@@ -82,6 +88,18 @@ public class HomeController {
         pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "seeCount"));
         articlePage = articleJpa.findByStatusAndResImgIsNotNull(1, pageable);
         model.addAttribute("hots", articlePage.getContent());
+
+        // 标签
+        List<Object[]> tagArray = tagJpa.findOrderByCount();
+        List tags = new ArrayList();
+        for (int i = 0; i < tagArray.size(); i++){
+            Object[] objects = tagArray.get(i);
+            tags.add(objects[0]);
+            if (i > 11){
+                break;
+            }
+        }
+        model.addAttribute("tags", tags);
     }
 
     @GetMapping("/")
@@ -115,6 +133,19 @@ public class HomeController {
         model.addAttribute("article", article);
 
         return "article";
+    }
+
+
+    @GetMapping("/tag/{name}")
+    public String tag(@PathVariable String name, Model model) {
+        List<Tag> tagList = tagJpa.findByName(name);
+        List<Long> ids = tagList.stream().map(Tag::getArticleId).distinct().collect(Collectors.toList());
+        List<Article> articleList = articleJpa.findAllById(ids);
+
+        model.addAttribute("articles", articleList);
+        model.addAttribute("tag", name);
+
+        return "tag";
     }
 
 

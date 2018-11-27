@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{layout/blog}">
+<head>
+    <title>帝一流博客 - 学习笔记</title>
+</head>
+<body>
+
+<div layout:fragment="title" class="row mb-4">
+    <div class="col-md-6">
+        <h2 class="mb-4" th:text="'#  ' + ${tag}"></h2>
+    </div>
+</div>
+<div layout:fragment="main" class="col-md-12 col-lg-8 main-content">
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <div class="post-entry-horzontal" th:each="art: ${articles}">
+                <a th:href="@{/article/{id}(id = ${art.id})}">
+                    <div class="image element-animate" data-animate-effect="fadeIn"
+                         th:style="'background-image: url(' + @{/image/pic/2018/{img}(img = ${art.resImg})}  + ');'"></div>
+                    <span class="text">
+                      <div class="post-meta">
+                        <span class="category" th:text="${art.tagList[0].name}">Travel</span>
+                        <span class="mr-2" th:text="${art.createTime}"> </span> &bullet;
+                        <span class="ml-2" th:utext="|<span class='fa fa-eye'></span>&nbsp;${art.seeCount}|"></span>
+                      </div>
+                      <h2 th:text="${art.title}"></h2>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
