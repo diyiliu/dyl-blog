@@ -1,6 +1,7 @@
 package com.dyl.blog.web.blog.facade;
 
 import com.dyl.blog.web.blog.dto.Classify;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -13,4 +14,6 @@ import java.util.List;
 public interface ClassifyJpa extends JpaRepository<Classify, Long> {
 
     List<Classify> findByPidOrderBySort(Long pid);
+
+    List<Classify> findByType(int type, Sort sort);
 }

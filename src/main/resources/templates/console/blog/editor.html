@@ -51,11 +51,7 @@
                                 <select class="selectpicker form-control"
                                         data-style="select-with-transition"
                                         title="选择分类" data-size="5" name="classify.id">
-                                    <option value="10">物联网</option>
-                                    <option value="11">大数据</option>
-                                    <option value="12">前端开发</option>
-                                    <option value="13">后端开发</option>
-                                    <option value="14">游戏开发</option>
+                                    <option th:each="clz: ${classifys}" th:value="${clz.id}" th:text="${clz.name}"></option>
                                 </select>
                             </div>
                         </div>

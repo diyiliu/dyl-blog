@@ -3,7 +3,6 @@ package com.dyl.blog.web;
 import com.dyl.blog.support.model.PageData;
 import com.dyl.blog.support.model.RespBody;
 import com.dyl.blog.support.util.DateUtil;
-import com.dyl.blog.support.util.cache.ICache;
 import com.dyl.blog.web.blog.dto.Article;
 import com.dyl.blog.web.blog.dto.Classify;
 import com.dyl.blog.web.blog.facade.ArticleJpa;
@@ -59,7 +58,7 @@ public class HomeController {
     public void classifyAttribute(Model model) {
         List<Classify> classifyList = classifyJpa.findAll(Sort.by(new String[]{"pid", "sort"}));
         classifyList.forEach(e -> {
-            List articleList = articleJpa.findByClassify_Id(e.getId());
+            List articleList = articleJpa.findByStatusAndClassify_Id(1, e.getId());
             e.setCount(articleList.size());
         });
 
@@ -76,18 +75,18 @@ public class HomeController {
 
         // 推荐
         Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, new String[]{"isTop", "updateTime"}));
-        Page<Article> articlePage = articleJpa.findByResImgIsNotNull(pageable);
+        Page<Article> articlePage = articleJpa.findByStatusAndResImgIsNotNull(1, pageable);
         model.addAttribute("tops", articlePage.getContent());
 
         // 热门
         pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "seeCount"));
-        articlePage = articleJpa.findByResImgIsNotNull(pageable);
+        articlePage = articleJpa.findByStatusAndResImgIsNotNull(1, pageable);
         model.addAttribute("hots", articlePage.getContent());
     }
 
     @GetMapping("/")
     public String index(Model model) {
-        List articles = articleJpa.findAll();
+        List articles = articleJpa.findByStatus(1);
         model.addAttribute("totalNumber", articles.size());
         model.addAttribute("active", 0);
 
@@ -103,7 +102,7 @@ public class HomeController {
         Classify classify = classifyJpa.findById(id).get();
         model.addAttribute("classify", classify);
 
-        List articles = articleJpa.findByClassify_Id(id);
+        List articles = articleJpa.findByStatusAndClassify_Id(1, id);
         model.addAttribute("totalNumber", articles.size());
         model.addAttribute("active", classify.getId());
 
@@ -126,9 +125,9 @@ public class HomeController {
 
         Page<Article> articlePage;
         if (id == 0) {
-            articlePage = articleJpa.findAll(pageable);
+            articlePage = articleJpa.findByStatus(1, pageable);
         } else {
-            articlePage = articleJpa.findByClassify_Id(id, pageable);
+            articlePage = articleJpa.findByStatusAndClassify_Id(1, id, pageable);
         }
 
         pageData.setTotal(articlePage.getTotalPages());

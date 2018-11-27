@@ -14,9 +14,13 @@ import java.util.List;
  */
 public interface ArticleJpa extends JpaRepository<Article, Long> {
 
-    Page<Article> findByClassify_Id(long id, Pageable pageable);
+    List<Article> findByStatus(int status);
 
-    List<Article> findByClassify_Id(long id);
+    Page<Article> findByStatus(int status, Pageable pageable);
 
-    Page<Article> findByResImgIsNotNull(Pageable pageable);
+    Page<Article> findByStatusAndClassify_Id(int status, long id, Pageable pageable);
+
+    List<Article> findByStatusAndClassify_Id(int status, long id);
+
+    Page<Article> findByStatusAndResImgIsNotNull(int status, Pageable pageable);
 }

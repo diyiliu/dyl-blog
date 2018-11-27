@@ -5,7 +5,9 @@ import com.dyl.blog.web.sys.dto.SysUser;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Description: Article
@@ -40,6 +42,11 @@ public class Article {
     @JoinColumn(name = "classify", referencedColumnName = "id")
     private Classify classify;
 
+    @OrderBy("sort asc")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "articleId")
+    private List<Tag> tagList;
+
+    @Transient
     private String tags;
 
     private Integer open;
