@@ -81,7 +81,7 @@
                         <!-- END sidebar-box -->
                         <div class="sidebar-box">
                             <div class="bio text-center">
-                                <img th:src="@{/assets/image/person_1.jpg}" alt="Image Placeholder" class="img-fluid">
+                                <img th:src="@{/assets/image/person_0.jpg}" alt="Image Placeholder" class="img-fluid">
                                 <div class="bio-body">
                                     <h2>DYL(帝一流)</h2>
                                     <p>
@@ -148,11 +148,12 @@
         <footer class="site-footer">
             <div class="container">
                 <div class="row mb-5">
-                    <div class="col-md-4">
-                        <h3>资讯</h3>
-                        <p>
-                            <img th:src="@{/assets/image/img_1.jpg}" alt="Image placeholder" class="img-fluid">
-                        </p>
+                    <div class="col-md-6">
+                        <h3>赞赏</h3>
+                        <div class="pay">
+                            <div class="img" th:style="'background-image: url(' + @{/assets/image/pay_wx.jpg} + ');'"></div>
+                            <div class="img" th:style="'background-image: url(' + @{/assets/image/pay_zfb.jpg} + ');'"></div>
+                        </div>
                     </div>
                     <div class="col-md-6 ml-auto">
                         <div class="row">

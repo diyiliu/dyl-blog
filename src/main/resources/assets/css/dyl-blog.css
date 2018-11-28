@@ -71,3 +71,11 @@
     background-size: cover;
     background-position: top center;
 }
+
+.pay .img{
+    width: 210px;
+    height: 210px;
+    background-size: cover;
+    background-position: top center;
+    display: inline-block;
+}
