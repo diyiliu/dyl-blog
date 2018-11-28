@@ -17,8 +17,14 @@
         <div class="col-md-12">
             <div class="post-entry-horzontal" th:each="art: ${articles}">
                 <a th:href="@{/article/{id}(id = ${art.id})}">
-                    <div class="image element-animate" data-animate-effect="fadeIn"
-                         th:style="'background-image: url(' + @{/image/pic/2018/{img}(img = ${art.resImg})}  + ');'"></div>
+                    <div th:if="${art.resImg != null}" class="image element-animate" data-animate-effect="fadeIn"
+                         th:style="'background-image: url(' + @{/image/pic/2018/{img}(img = ${art.resImg})}  + ');'">
+                    </div>
+                    <div th:if="${art.resImg == null}" class="image element-animate" data-animate-effect="fadeIn"
+                         style="border: 1px solid #e6e6e6;">
+                        <p class="overview" th:text="${art.overview}"></p>
+                    </div>
+
                     <span class="text">
                       <div class="post-meta">
                         <span class="category" th:text="${art.tagList[0].name}">Travel</span>

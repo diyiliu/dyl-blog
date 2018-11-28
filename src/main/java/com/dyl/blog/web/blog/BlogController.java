@@ -15,10 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -88,6 +85,13 @@ public class BlogController {
         respMap.put("total", userPage.getTotalElements());
 
         return respMap;
+    }
+
+    @DeleteMapping("/article/{id}")
+    public Integer deleteArticle(@PathVariable("id") long id) {
+        articleJpa.deleteById(id);
+
+        return 1;
     }
 
     private Long handleImg(String content, HttpSession session) throws Exception{
