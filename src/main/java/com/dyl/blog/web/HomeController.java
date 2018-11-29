@@ -13,6 +13,7 @@ import com.dyl.blog.web.sys.dto.ResImg;
 import com.dyl.blog.web.sys.dto.SysUser;
 import com.dyl.blog.web.sys.facade.ResImgJpa;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -28,12 +29,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -173,6 +172,46 @@ public class HomeController {
     public RespBody imgUpload(MultipartFile file, HttpSession session) throws Exception {
         RespBody respBody = new RespBody();
 
+        String imgPath = upload(file, session);
+        if (StringUtils.isEmpty(imgPath)) {
+            respBody.setStatus(0);
+            respBody.setMessage("图片保存失败");
+        } else {
+            respBody.setStatus(1);
+            respBody.setData(imgPath);
+        }
+
+        return respBody;
+    }
+
+    @ResponseBody
+    @GetMapping("/image/pic/{time}/{id}")
+    public ResponseEntity showPicture(@PathVariable long id, @PathVariable String time) throws Exception {
+        ResImg img = resImgJpa.findById(id).get();
+        if (img != null) {
+            org.springframework.core.io.Resource imgRes = new UrlResource("file:" + img.getPath());
+
+            return ResponseEntity.ok(FileUtils.readFileToByteArray(imgRes.getFile()));
+        }
+
+        return null;
+    }
+
+    @ResponseBody
+    @RequestMapping("/ckeditor/upload")
+    public Map editorUpload(MultipartFile upload, HttpSession session) throws Exception{
+        String fileName = upload.getOriginalFilename();
+        String imgPath = upload(upload, session);
+
+        Map respMap = new HashMap();
+        respMap.put("uploaded", 1);
+        respMap.put("fileName", fileName);
+        respMap.put("url", imgPath);
+
+        return respMap;
+    }
+
+    private String upload(MultipartFile file, HttpSession session) throws Exception{
         String date = String.format("%1$tY%1$tm", new Date());
         String picDir = environment.getProperty("upload.pic") + date + "/";
         org.springframework.core.io.Resource resDir = new UrlResource(picDir);
@@ -200,27 +239,9 @@ public class HomeController {
                 session.setAttribute("temp_pic", imgList);
             }
             imgList.add(img);
-
             String timeStr = DateUtil.dateToString(img.getCreateTime(), "%1$tY%1$tm%1$td %1$tH%1$tM%1$tS");
 
-            respBody.setStatus(1);
-            respBody.setData("/image/pic/" + timeStr + "/" + img.getId());
-        } else {
-            respBody.setStatus(0);
-            respBody.setMessage("图片保存失败");
-        }
-
-        return respBody;
-    }
-
-    @ResponseBody
-    @GetMapping("/image/pic/{time}/{id}")
-    public ResponseEntity showPicture(@PathVariable long id, @PathVariable String time) throws Exception {
-        ResImg img = resImgJpa.findById(id).get();
-        if (img != null) {
-            org.springframework.core.io.Resource imgRes = new UrlResource("file:" + img.getPath());
-
-            return ResponseEntity.ok(FileUtils.readFileToByteArray(imgRes.getFile()));
+            return "/image/pic/" + timeStr + "/" + img.getId();
         }
 
         return null;

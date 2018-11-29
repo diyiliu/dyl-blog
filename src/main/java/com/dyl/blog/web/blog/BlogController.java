@@ -16,9 +16,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -93,6 +97,14 @@ public class BlogController {
 
         return 1;
     }
+
+//    @PostMapping("/editor/{id}")
+//    public void editor(@PathVariable("id") long id, HttpServletResponse response,
+//                       RedirectAttributes redirectAttributes) throws IOException {
+//
+//        redirectAttributes.addFlashAttribute("article", id);
+//        response.sendRedirect("/console/editor");
+//    }
 
     private Long handleImg(String content, HttpSession session) throws Exception{
         List<ResImg> imgList = (List<ResImg>) session.getAttribute("temp_pic");

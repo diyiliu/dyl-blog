@@ -1,21 +1,24 @@
 package com.dyl.blog.web;
 
+import com.dyl.blog.web.blog.dto.Article;
+import com.dyl.blog.web.blog.facade.ArticleJpa;
 import com.dyl.blog.web.sys.dto.SysAsset;
 import com.dyl.blog.web.sys.facade.SysAssetJpa;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.ExcessiveAttemptsException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 
 /**
  * Description: LoginController
@@ -30,6 +33,9 @@ public class LoginController {
 
     @Resource
     private SysAssetJpa sysAssetJpa;
+
+    @Resource
+    private ArticleJpa articleJpa;
 
 
     @GetMapping
@@ -79,7 +85,8 @@ public class LoginController {
 
 
     @GetMapping("/{menu}")
-    public String display(@PathVariable("menu") String menu, HttpServletRequest request) {
+    public String display(@PathVariable("menu") String menu, HttpServletRequest request,
+                          @ModelAttribute("article") String article, Model model) {
 
         SysAsset asset = sysAssetJpa.findByController("console/" + menu);
         if (asset == null) {
@@ -90,6 +97,20 @@ public class LoginController {
         // 设置当前页
         request.getSession().setAttribute("active", asset);
 
+        Article art = new Article();
+        model.addAttribute("article", art);
+        if (StringUtils.isNotEmpty(article)){
+            art = articleJpa.findById(Long.parseLong(article)).get();
+            model.addAttribute("article", art);
+        }
+
         return view;
+    }
+
+    @PostMapping("/blog/editor/{id}")
+    public String editor(@PathVariable("id") long id, RedirectAttributes redirectAttributes){
+        redirectAttributes.addFlashAttribute("article", id);
+
+        return "redirect:/console/editor";
     }
 }

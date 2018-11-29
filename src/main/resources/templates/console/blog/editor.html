@@ -4,10 +4,12 @@
       layout:decorate="~{layout/console}">
 <head>
     <title>帝一流博客 - 后台管理</title>
-
-    <link th:href="@{/assets/plugin/summernote-0.8.10/summernote-bs4.css}" type="text/css" rel="stylesheet">
+    <style>
+        body::-webkit-scrollbar {
+            display:none
+        }
+    </style>
 </head>
-
 
 <body>
 <div layout:fragment="breadcrumb">
@@ -30,7 +32,7 @@
                         <input type="text" class="form-control" id="title" name="title">
                     </div>
                     <div class="form-group">
-                        <div id="summernote"></div>
+                        <div name="ckeditor" id="ckeditor" th:utext="${article.content}"></div>
                     </div>
                 </div>
             </div>
@@ -117,59 +119,29 @@
 </div>
 
 <div layout:fragment="pageJs">
-    <script th:src="@{/assets/plugin/summernote-0.8.10/summernote-bs4.js}"></script>
-    <script th:src="@{/assets/plugin/summernote-0.8.10/lang/summernote-zh-CN.js}"></script>
-
+    <script th:src="@{/assets/plugin/ckeditor/ckeditor.js}"></script>
     <script th:inline="javascript">
-        $(function () {
-            var height = $("div.main-panel").height() - 510;
-            $('#summernote').summernote({
-                lang: 'zh-CN',
-                height: height,
-                toolbar: [
-                    ['style', ['style']],
-                    ['font', ['bold', 'underline', 'clear']],
-                    ['color', ['color']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['fontsize', ['fontsize']],
-                    ['height', ['height']],
-                    ['table', ['table']],
-                    ['insert', ['link', 'picture']],
-                    ['view', ['fullscreen']]
-                ],
-                callbacks: {
-                    onImageUpload: function (files) {
-                        var formData = new FormData();
-                        formData.append('file', files[0]);
 
-                        $.ajax({
-                            type: 'post',
-                            url: /*[[@{/image/upload/}]]*/,
-                            data: formData,
-                            processData: false,
-                            contentType: false,
-                            success: function (result) {
-                                if (result.status == 1) {
-                                    $('#summernote').summernote('insertImage', result.data);
-                                }
-                            },
-                            error: function () {
-                                layer.msg("插入图片失败!");
-                            }
-                        });
-                    }
-                }
+        var editor;
+        $(function () {
+            var uploadPath = /*[[@{/ckeditor/upload/}]]*/;
+            editor = CKEDITOR.replace('ckeditor', {
+                height: 460,
+                config: './config.js',
+                uploadUrl: uploadPath,
+                filebrowserUploadUrl: uploadPath
             });
         });
 
         function save(i) {
-            var markupStr = $('#summernote').summernote('code');
+            var markupStr = editor.getData();
+            var textStr = editor.document.getBody().getText();
 
             var formData = new FormData($('#myForm')[0]);
             formData.append('title', $('#title').val());
             formData.append('status', i);
             formData.append('content', markupStr);
-            formData.append('overview', $(markupStr).text().substr(0, 100));
+            formData.append('overview', textStr.substr(0, 100));
             $.ajax({
                 type: 'post',
                 url: /*[[@{/console/blog/save/}]]*/,
