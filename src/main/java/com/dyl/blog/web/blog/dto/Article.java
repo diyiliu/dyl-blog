@@ -3,6 +3,8 @@ package com.dyl.blog.web.blog.dto;
 import com.dyl.blog.support.util.DateUtil;
 import com.dyl.blog.web.sys.dto.SysUser;
 import lombok.Data;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -64,5 +66,18 @@ public class Article {
     public String getCreateTimeStr() {
 
         return DateUtil.dateToString(createTime, "%1$tY-%1$tm-%1$td");
+    }
+
+    public String getTags() {
+        if (StringUtils.isEmpty(tags) && CollectionUtils.isNotEmpty(tagList)){
+            String str = "";
+            for (Tag t: tagList){
+                str += t.getName() + ",";
+            }
+
+            return str;
+        }
+
+        return tags;
     }
 }

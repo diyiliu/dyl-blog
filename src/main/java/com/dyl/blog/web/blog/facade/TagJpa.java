@@ -3,6 +3,7 @@ package com.dyl.blog.web.blog.facade;
 import com.dyl.blog.web.blog.dto.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,4 +18,7 @@ public interface TagJpa extends JpaRepository<Tag, Long> {
     List findOrderByCount();
 
     List<Tag> findByName(String name);
+
+    @Transactional
+    void deleteByArticleId(long id);
 }
