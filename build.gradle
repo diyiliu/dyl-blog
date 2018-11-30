@@ -22,8 +22,6 @@ ext {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: '*.jar')
-
     // spring-boot
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "$springBootVersion"
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: "$springBootVersion"
@@ -63,9 +61,37 @@ tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
 
+
+
 bootJar {
     baseName = 'dyl-blog'
     version = ''
+
+    manifest {
+        attributes(
+                'Class-Path': 'lib/' + configurations.compile.collect {
+                    it.name
+                }.join(' lib/')
+        )
+    }
+    
+    // 只打包自身文件，过滤第三方依赖
+    include{
+        it.file.path.contains('build\\classes') ||
+                it.file.path.contains('build\\resources')
+    }
+    
+//    exclude{
+//        it.file.path.contains('.gradle')
+//        println it.file.path
+//        return false
+//    }
+}
+
+// 拷贝文件
+task copyJars(type: Copy) {
+    from configurations.runtime
+    into 'dist'
 }
 
 buildscript {
