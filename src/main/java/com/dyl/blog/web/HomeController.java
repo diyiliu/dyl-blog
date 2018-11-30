@@ -149,7 +149,7 @@ public class HomeController {
     @ResponseBody
     @PostMapping("/classify/{id}")
     public PageData classify(PageData pageData, @PathVariable long id) {
-        Pageable pageable = PageRequest.of(pageData.getPageNo() - 1, pageData.getPageSize(), Sort.by(Sort.Direction.DESC, "updateTime"));
+        Pageable pageable = PageRequest.of(pageData.getPageNo() - 1, pageData.getPageSize(), Sort.by(Sort.Direction.DESC, "createTime"));
 
         Page<Article> articlePage;
         if (id == 0) {
