@@ -237,9 +237,9 @@ public class HomeController {
                 session.setAttribute("temp_pic", imgList);
             }
             imgList.add(img);
-            String timeStr = DateUtil.dateToString(img.getCreateTime(), "%1$tY%1$tm%1$td %1$tH%1$tM%1$tS");
+            long time = img.getCreateTime().getTime();
 
-            return "/image/pic/" + timeStr + "/" + img.getId();
+            return "/image/pic/" + time + "/" + img.getId();
         }
 
         return null;
