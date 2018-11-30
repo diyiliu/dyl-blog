@@ -47,8 +47,6 @@
 <div layout:fragment="pageJs">
     <script th:inline="javascript">
         $(function () {
-            var $table = $('#myTable');
-
             DP.init();
 
             var tableHeight = $("div.main-panel").height() - 326;
@@ -119,10 +117,12 @@
                         formatter: function (value, row, index) {
 
                             if (value == 1) {
-                                    return '<div class="td-actions"><button type="button" class="btn btn-link disabled"><i class="material-icons text-warning">star</i></button></div>';
+                                    return '<div class="td-actions"><button type="button" class="btn btn-link" ' +
+                                        'onclick="updateStatus(\'top\', 0,' + row.id + ')"><i class="material-icons text-warning">star</i></button></div>';
                             }
 
-                            return '<div class="td-actions"><button type="button" class="btn btn-link disabled"><i class="material-icons">not_interested</i></button></div>';
+                            return '<div class="td-actions"><button type="button" class="btn btn-link" ' +
+                                'onclick="updateStatus(\'top\', 1, ' + row.id + ')"><i class="material-icons">not_interested</i></button></div>';
                         }
                     },
                     {
@@ -130,12 +130,13 @@
                         title: '状态',
                         align: 'center',
                         formatter: function (value, row, index) {
-                            if (value == 0) {
-
-                                return '草稿';
+                            if (value == 1) {
+                                return '<div class="td-actions"><button type="button" class="btn btn-link" ' +
+                                    'onclick="updateStatus(\'status\', 0,' + row.id + ')"><i class="material-icons text-success">toggle_on</i></button></div>';
                             }
 
-                            return '正常';
+                            return '<div class="td-actions"><button type="button" class="btn btn-link" ' +
+                                'onclick="updateStatus(\'status\', 1, ' + row.id + ')"><i class="material-icons text-danger">toggle_off</i></button></div>';
                         }
                     },
                     {
@@ -156,6 +157,27 @@
                 ]
             });
         });
+
+        function updateStatus(i, j, k) {
+            var path = /*[[@{/console/blog/article/}]]*/;
+            $.ajax({
+                type: 'put',
+                url: path + i,
+                data: {
+                    id: k,
+                    val: j
+                },
+                dataType: "json",
+                success: function (result) {
+                    if (result == 1) {
+                        alertTip('success', '修改成功');
+                        DP.getTable().bootstrapTable("refresh");
+                    } else {
+                        alertTip('error', '修改失败');
+                    }
+                }
+            });
+        }
 
         function editor(i) {
             var path = /*[[@{/console/blog/editor/}]]*/;

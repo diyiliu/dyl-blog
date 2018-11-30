@@ -3,7 +3,9 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
       layout:decorate="~{layout/blog}">
 <head>
-    <title>DYL博客 - 记录成长过程</title>
+    <title th:text="${article.title} + ' - DYL博客'"></title>
+    <meta name="keywords" th:content="${article.tags}" />
+    <meta name="description" th:content="${article.overview}" />
 </head>
 <body>
 

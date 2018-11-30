@@ -148,7 +148,7 @@
             formData.append('title', $('#title').val());
             formData.append('status', i);
             formData.append('content', markupStr);
-            formData.append('overview', textStr.substr(0, 100));
+            formData.append('overview', textStr.substr(0, 50));
             $.ajax({
                 type: 'post',
                 url: /*[[@{/console/blog/save/}]]*/,
@@ -162,8 +162,9 @@
                     $('.preloader').fadeOut();
                 },
                 success: function (result) {
-                    if (result == 1) {
+                    if (result.status == 1) {
                         alertTip('success', '保存成功');
+                        toDo(i, result.data);
                     } else {
                         alertTip('error', '保存失败');
                     }
@@ -172,6 +173,35 @@
                     alertTip('error', '保存失败');
                 }
             });
+        }
+
+        function toDo(i,j) {
+            var t = '保存成功';
+            if (i == 1){
+                t = '发布成功';
+            }
+            swal({
+                    title: t,
+                    text: "",
+                    type: "success",
+                    showCancelButton: true,
+                    confirmButtonColor: "#ea2c6d",
+                    confirmButtonText: "查看原文",
+                    cancelButtonText: "返回列表",
+                    closeOnConfirm: false,
+                    closeOnCancel: false
+                },
+                function(isConfirm){
+                    var path = /*[[@{/}]]*/;
+                    if (isConfirm) {
+                        path += 'article/' + j;
+                        window.open(path);
+                        swal.close();
+                    }else {
+                        path += 'console/article';
+                        window.location.href = path;
+                    }
+                });
         }
     </script>
 </div>

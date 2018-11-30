@@ -1,5 +1,6 @@
 package com.dyl.blog.web.blog;
 
+import com.dyl.blog.support.model.RespBody;
 import com.dyl.blog.support.util.DateUtil;
 import com.dyl.blog.web.blog.dto.Article;
 import com.dyl.blog.web.blog.dto.Tag;
@@ -45,7 +46,9 @@ public class BlogController {
     private ResImgJpa resImgJpa;
 
     @PostMapping("/save")
-    public Integer save(Article article, HttpSession session) throws Exception {
+    public RespBody save(Article article, HttpSession session) throws Exception {
+
+        Article temp;
         String tags = article.getTags();
         if (article.getId() == null) {
             SysUser user = (SysUser) session.getAttribute("user");
@@ -55,33 +58,32 @@ public class BlogController {
             article.setSeeCount(0);
             article.setCreateTime(new Date());
             article.setUpdateTime(new Date());
-            article = articleJpa.save(article);
-            if (article == null) {
+            temp = articleJpa.save(article);
+        } else {
+            long id = article.getId();
+            temp = articleJpa.findById(id).get();
+            Long resImg = handleImg(article.getContent(), session);
 
-                return 0;
-            }
-            handleTags(article.getId(), tags);
-
-            return 1;
+            article.setUser(temp.getUser());
+            article.setCreateTime(temp.getCreateTime());
+            article.setUpdateTime(new Date());
+            article.setSeeCount(temp.getSeeCount());
+            article.setResImg(resImg == null ? temp.getResImg() : resImg);
+            temp = articleJpa.save(article);
+        }
+        RespBody respBody = new RespBody();
+        // 操作失败
+        if (temp == null) {
+            respBody.setStatus(0);
+            return respBody;
         }
 
-        long id = article.getId();
-        Article temp = articleJpa.findById(id).get();
-        Long resImg = handleImg(article.getContent(), session);
-
-        article.setUser(temp.getUser());
-        article.setCreateTime(temp.getCreateTime());
-        article.setUpdateTime(new Date());
-        article.setSeeCount(temp.getSeeCount());
-        article.setResImg(resImg == null? temp.getResImg(): resImg);
-        article = articleJpa.save(article);
-        if (article == null) {
-
-            return 0;
-        }
+        long id = temp.getId();
         handleTags(id, tags);
+        respBody.setStatus(1);
+        respBody.setData(id);
 
-        return 1;
+        return respBody;
     }
 
     @PostMapping("/articles")
@@ -106,6 +108,23 @@ public class BlogController {
         return 1;
     }
 
+    @PutMapping("/article/{item}")
+    public Integer modify(@PathVariable String item, @RequestParam long id, @RequestParam int val) {
+        Article article = articleJpa.findById(id).get();
+        if (item.equals("top")){
+            article.setIsTop(val);
+        }else {
+            article.setStatus(val);
+        }
+        article = articleJpa.save(article);
+        if (article == null){
+
+            return 0;
+        }
+
+        return 1;
+    }
+
 //    @PostMapping("/editor/{id}")
 //    public void editor(@PathVariable("id") long id, HttpServletResponse response,
 //                       RedirectAttributes redirectAttributes) throws IOException {
@@ -114,7 +133,7 @@ public class BlogController {
 //        response.sendRedirect("/console/editor");
 //    }
 
-    private void handleTags(long id, String tags){
+    private void handleTags(long id, String tags) {
         tagJpa.deleteByArticleId(id);
         if (StringUtils.isNotEmpty(tags)) {
             String[] tagArray = tags.split(",");
