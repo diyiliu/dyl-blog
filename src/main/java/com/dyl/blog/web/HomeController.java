@@ -23,13 +23,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.util.*;
@@ -91,10 +89,10 @@ public class HomeController {
         // 标签
         List<Object[]> tagArray = tagJpa.findOrderByCount();
         List tags = new ArrayList();
-        for (int i = 0; i < tagArray.size(); i++){
+        for (int i = 0; i < tagArray.size(); i++) {
             Object[] objects = tagArray.get(i);
             tags.add(objects[0]);
-            if (i > 11){
+            if (i > 11) {
                 break;
             }
         }
@@ -199,7 +197,7 @@ public class HomeController {
 
     @ResponseBody
     @RequestMapping("/ckeditor/upload")
-    public Map editorUpload(MultipartFile upload, HttpSession session) throws Exception{
+    public Map editorUpload(MultipartFile upload, HttpSession session) throws Exception {
         String fileName = upload.getOriginalFilename();
         String imgPath = upload(upload, session);
 
@@ -211,7 +209,7 @@ public class HomeController {
         return respMap;
     }
 
-    private String upload(MultipartFile file, HttpSession session) throws Exception{
+    private String upload(MultipartFile file, HttpSession session) throws Exception {
         String date = String.format("%1$tY%1$tm", new Date());
         String picDir = environment.getProperty("upload.pic") + date + "/";
         org.springframework.core.io.Resource resDir = new UrlResource(picDir);
