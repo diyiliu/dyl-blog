@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <link th:href="@{/assets/image/favicon_1.ico}" rel="icon">
+    <title>帝一流博客</title>
+
+    <link rel="stylesheet" th:href="@{/assets/css/googleapis.font.css}">
+    <!-- CSS Files -->
+    <link rel="stylesheet" th:href="@{/assets/console/css/material-dashboard.min.css}"/>
+    <link rel="stylesheet" th:href="@{/assets/css/error-page.css}"/>
+</head>
+
+<body>
+<section id="wrapper" class="error-page">
+    <div class="error-box" th:style="'background: url(' + @{/assets/image/background/error-bg-1.jpg} + ') no-repeat center center #fff;'">
+        <div class="error-body text-center">
+            <h1>404</h1>
+            <h3 class="text-uppercase">Page Not Found !</h3>
+            <p class="text-muted m-t-30 m-b-30">YOU SEEM TO BE TRYING TO FIND HIS WAY HOME</p>
+            <a th:href="@{/}" class="btn btn-info btn-rounded waves-effect waves-light m-b-40">Back to home</a> </div>
+    </div>
+</section>
+</body>
+</html>
