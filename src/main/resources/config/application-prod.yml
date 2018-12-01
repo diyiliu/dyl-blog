@@ -1,0 +1,14 @@
+# WEB PROPERTIES
+server:
+  port: 8090
+  context-path: '/'
+
+# SPRING
+spring:
+  # DATASOURCE
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: 'jdbc:mysql://218.3.247.227:3206/dyl-blog?useUnicode=true&characterEncoding=UTF-8'
+    username: diyiliu
+    password: 572772828

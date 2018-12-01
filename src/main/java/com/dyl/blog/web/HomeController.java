@@ -12,6 +12,7 @@ import com.dyl.blog.web.blog.facade.TagJpa;
 import com.dyl.blog.web.sys.dto.ResImg;
 import com.dyl.blog.web.sys.dto.SysUser;
 import com.dyl.blog.web.sys.facade.ResImgJpa;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.Environment;
@@ -28,8 +29,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
+import java.io.IOException;
+import java.net.URLConnection;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,6 +43,7 @@ import java.util.stream.Collectors;
  * Update: 2018-11-08 10:50
  */
 
+@Slf4j
 @Controller
 public class HomeController {
 
@@ -182,6 +187,7 @@ public class HomeController {
         return respBody;
     }
 
+/*
     @ResponseBody
     @GetMapping("/image/pic/{time}/{id}")
     public ResponseEntity showPicture(@PathVariable long id, @PathVariable String time) throws Exception {
@@ -193,6 +199,25 @@ public class HomeController {
         }
 
         return null;
+    }
+*/
+
+    @GetMapping("/image/pic/{time}/{id}")
+    public void showPicture(@PathVariable long id, @PathVariable String time, HttpServletResponse response) {
+        ResImg img = resImgJpa.findById(id).get();
+        if (img != null) {
+            try {
+                org.springframework.core.io.Resource imgRes = new UrlResource("file:" + img.getPath());
+                if (imgRes != null && imgRes.exists()) {
+                    response.setHeader("Content-Type", URLConnection.guessContentTypeFromName(imgRes.getFilename()));
+                    FileCopyUtils.copy(imgRes.getInputStream(), response.getOutputStream());
+                    response.flushBuffer();
+                }
+            } catch (IOException e) {
+                log.info("Error writing file to output stream. Filename was '{}'", img.getPath());
+                throw new RuntimeException("IOError writing file to output stream");
+            }
+        }
     }
 
     @ResponseBody

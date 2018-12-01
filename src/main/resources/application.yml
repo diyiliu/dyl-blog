@@ -6,7 +6,7 @@ server:
 # SPRING
 spring:
   profiles:
-    active: dev
+    active: prod
 
   servlet:
     multipart:
